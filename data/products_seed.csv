@@ -1,0 +1,5 @@
+external_id,name,url,image_url,category,subcategory,brand,price,available,availability_text,voltage,width_cm,installation_type,product_type,environment,premium_level
+mock-001,Cooktop premium compativel,https://www.kouzinaclub.com.br/,,Cozinha,Cooktops,Elettromec,9990.00,true,Disponivel para simulacao,220V,90,Embutir,Cooktop,Cozinha Gourmet,Premium
+mock-002,Forno de embutir recomendado,https://www.kouzinaclub.com.br/,,Cozinha,Fornos,Elettromec,8490.00,true,Disponivel para simulacao,220V,60,Embutir,Forno,Cozinha Planejada,Premium
+mock-003,Adega climatizada compacta,https://www.kouzinaclub.com.br/,,Espaco Gourmet,Adegas,Crissair,6990.00,true,Disponivel para simulacao,220V,45,Piso,Adega,Espaco Gourmet,Premium
+
