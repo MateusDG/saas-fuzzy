@@ -1,6 +1,6 @@
 # API Kouzina Reco
 
-Base local da Fase 1:
+Base local:
 
 ```text
 http://localhost:8000
@@ -22,8 +22,8 @@ Resposta:
 
 ## POST /events
 
-Recebe eventos anonimos do widget. Na Fase 1, o payload e validado e confirmado,
-mas nao e salvo no banco.
+Recebe eventos anonimos do widget. Na Fase 2, o payload e validado e salvo em
+`recommendation_events` quando o banco esta disponivel.
 
 Payload:
 
@@ -61,7 +61,8 @@ recommendation_click
 
 ## GET /recommendations
 
-Retorna recomendacoes mockadas.
+Retorna recomendacoes. Na Fase 2, a API tenta usar produtos importados no banco.
+Se o banco estiver vazio ou indisponivel, retorna o fallback mockado da Fase 1.
 
 Parametros:
 
@@ -93,4 +94,3 @@ Resposta:
   ]
 }
 ```
-

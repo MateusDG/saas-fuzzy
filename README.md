@@ -2,19 +2,19 @@
 
 MVP comercial minimo de recomendacao para o site Kouzina Club.
 
-Esta fase implementa somente a Fase 1 tecnica local:
+Este repositório implementa a base local das Fases 1 e 2:
 
 - API FastAPI minima.
 - `GET /health`.
-- `POST /events` mockado, com validacao de payload.
-- `GET /recommendations` mockado.
+- `POST /events` com validacao de payload e persistencia em PostgreSQL.
+- `GET /recommendations` usando catalogo importado, com fallback mockado.
 - Widget JavaScript puro.
 - Demo local do widget.
-- PostgreSQL preparado via Docker Compose, ainda sem conexao com a API.
+- PostgreSQL via Docker Compose.
 - CSV com 3 produtos mockados.
 
-Fora de escopo nesta fase: fuzzy, ontologia, integracao Tray, painel, login,
-deploy, ranking real e persistencia no banco.
+Fora de escopo: fuzzy, ontologia, integracao Tray, painel, login, deploy,
+ranking sofisticado, crawler, scraping e multi-loja completo.
 
 ## Estrutura
 
@@ -23,9 +23,13 @@ backend/
   app/
     __init__.py
     main.py
+    database.py
+    models.py
     recommender.py
     schemas.py
+    seed.py
     settings.py
+  tests/
   Dockerfile
   requirements.txt
 widget/
@@ -53,8 +57,7 @@ Copy-Item .env.example .env
 
 ## Rodar PostgreSQL
 
-O banco fica preparado para fases futuras. A API da Fase 1 ainda nao conecta
-nele.
+O banco e usado pela Fase 2 para produtos e eventos.
 
 ```bash
 docker compose up -d
@@ -88,6 +91,19 @@ A API ficara em:
 http://localhost:8000
 ```
 
+## Criar tabelas e importar produtos
+
+A API tenta criar as tabelas no startup. Para importar o catalogo inicial:
+
+```powershell
+cd backend
+python -m app.seed
+```
+
+O seed cria a loja padrao Kouzina e importa `data/products_seed.csv`. A
+importacao e idempotente por `external_id`, entao pode ser rodada mais de uma
+vez sem duplicar produtos.
+
 ## Testar API
 
 Healthcheck:
@@ -112,11 +128,15 @@ Documentacao interativa:
 http://localhost:8000/docs
 ```
 
-Recomendacoes mockadas:
+Recomendacoes:
 
 ```bash
 curl "http://localhost:8000/recommendations?product_id=12345&widget_id=product-page"
 ```
+
+Quando houver produtos importados no banco, a resposta usa o catalogo. Se o
+banco estiver vazio ou indisponivel, a API usa fallback mockado para manter o
+widget funcionando.
 
 Evento mockado no PowerShell:
 
@@ -167,7 +187,8 @@ recommendation_impression
 recommendation_click
 ```
 
-Os eventos sao validados e confirmados, mas ainda nao sao salvos em banco.
+Os eventos sao validados, confirmados e salvos em `recommendation_events`
+quando o banco esta disponivel.
 
 ## Privacidade
 
@@ -187,6 +208,12 @@ conteudo de formularios.
 
 ## Proxima fase
 
-A Fase 2 deve conectar PostgreSQL, criar tabelas simples, salvar eventos e
-preparar o catalogo inicial. Ranking real, fuzzy e ontologia continuam fora
-ate as fases posteriores.
+A proxima fase deve evoluir o catalogo e o recomendador v0 por regras. Fuzzy,
+ontologia, Tray, painel, login e deploy continuam fora ate fases posteriores.
+
+## Rodar testes
+
+```powershell
+cd backend
+pytest
+```

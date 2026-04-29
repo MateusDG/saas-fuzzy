@@ -6,9 +6,9 @@ Entregar uma primeira versao local, simples e mensuravel do Kouzina Reco:
 
 - API FastAPI minima;
 - widget JavaScript puro;
-- recomendacoes mockadas;
-- eventos anonimos mockados;
-- PostgreSQL preparado via Docker Compose, ainda sem conexao com a API.
+- recomendacoes via catalogo inicial, com fallback mockado;
+- eventos anonimos persistidos quando o banco esta disponivel;
+- PostgreSQL preparado via Docker Compose.
 
 ## Escopo da Fase 1 tecnica local
 
@@ -23,10 +23,20 @@ Inclui:
 - `.env.example`;
 - `data/products_seed.csv` com 3 produtos mockados.
 
+## Escopo da Fase 2
+
+Inclui:
+
+- conexao da API ao PostgreSQL;
+- tabelas `stores`, `products`, `recommendation_events` e `manual_product_relations`;
+- seed idempotente do catalogo inicial;
+- persistencia de eventos anonimos;
+- recomendacoes usando produtos do banco quando houver catalogo;
+- fallback mockado quando o banco estiver vazio ou indisponivel;
+- testes basicos.
+
 ## Fora de escopo nesta fase
 
-- banco persistente conectado;
-- SQLAlchemy models completos;
 - ranking real;
 - fuzzy;
 - ontologia;
@@ -40,12 +50,11 @@ Inclui:
 
 - API roda localmente;
 - `/health` responde;
-- `/events` valida payload e confirma recebimento;
-- `/recommendations` retorna recomendacoes mockadas;
+- `/events` valida payload e salva evento quando o banco esta disponivel;
+- `/recommendations` retorna recomendacoes do catalogo ou fallback mockado;
 - `demo.html` carrega o widget;
 - widget renderiza recomendacoes;
 - widget envia `page_view`;
 - widget envia `recommendation_impression`;
 - widget envia `recommendation_click`;
 - nenhum dado pessoal e coletado.
-
