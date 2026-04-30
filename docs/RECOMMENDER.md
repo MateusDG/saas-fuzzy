@@ -11,7 +11,8 @@ motivo textual, mantendo fallback mockado quando o catalogo nao for suficiente.
 Na Fase 4, o CSV seedado passou a conter cerca de 30 produtos ficticios ou
 semi-realistas para exercitar melhor essas regras. Na Fase 4.2, o mesmo
 recomendador passou a operar tambem sobre catalogo oficial autorizado importado
-localmente por CSV.
+localmente por CSV. Na Fase 4.5, as relacoes complementares foram ampliadas
+com base nos tipos reais do catalogo oficial.
 
 ## Como funciona
 
@@ -39,18 +40,41 @@ estiver vazio, nulo, zerado, invalido ou sob consulta, essa regra nao pontua.
 
 ## Relacoes complementares
 
-Relacoes iniciais usadas no ranking:
+Relacoes comerciais/editoriais iniciais usadas no ranking:
 
 ```text
-Coifa -> Cooktop, Forno, Domino
+Cuba -> Misturador, Acessorio de Cozinha, Lava-loucas
+Misturador -> Cuba, Acessorio de Cozinha
+Coifa -> Cooktop, Forno, Domino, Acessorio de Coifa, Rangetop
+Acessorio de Coifa -> Coifa
 Cooktop -> Coifa, Forno, Domino
-Adega -> Cervejeira, Frigobar, Churrasqueira
-Churrasqueira -> Adega, Cervejeira, Coifa, Cooktop
-Forno -> Cooktop, Coifa
+Domino -> Coifa, Cooktop, Forno
+Forno -> Cooktop, Coifa, Micro-ondas, Gaveta Aquecida
+Micro-ondas -> Forno, Cooktop, Gaveta Aquecida
+Lava-loucas -> Cuba, Misturador, Acessorio de Cozinha
+Adega -> Cervejeira, Frigobar, Churrasqueira, Forno de Pizza
+Cervejeira -> Adega, Frigobar, Churrasqueira, Forno de Pizza, Maquina de Gelo
+Frigobar -> Adega, Cervejeira, Churrasqueira
+Churrasqueira -> Adega, Cervejeira, Coifa, Cooktop, Queimador, Forno de Pizza
+Forno de Pizza -> Churrasqueira, Cervejeira, Adega
+Refrigerador -> Freezer, Frigobar, Cervejeira, Maquina de Gelo
+Freezer -> Refrigerador
+Gaveta Aquecida -> Forno, Cooktop
+Cafeteira -> Forno, Micro-ondas, Gaveta Aquecida
+Queimador -> Churrasqueira, Cooktop, Rangetop
+Rangetop -> Coifa, Forno, Queimador
+Maquina de Gelo -> Cervejeira, Frigobar, Adega, Churrasqueira
+Acessorio de Cozinha -> Cuba, Misturador, Lava-loucas
 ```
 
-O codigo normaliza acentos e caixa para aceitar `Domino` e a forma acentuada no
-catalogo.
+Essas relacoes nao sao uma ontologia formal. Elas sao regras editoriais
+iniciais para melhorar o comportamento comercial do ranking v0 com o catalogo
+real autorizado. O codigo normaliza acentos, caixa e hifens para aceitar
+variacoes como `Domino`, `Dominó`, `Micro-ondas` e `Lava-loucas`.
+
+Ambientes como `Cozinha Gourmet` e `Espaco Gourmet` nao sao tratados como
+`product_type`. Eles continuam entrando apenas no criterio auxiliar de mesmo
+ambiente.
 
 ## Reasons
 
@@ -103,6 +127,10 @@ Produtos com `Preco venda = 0.00` sao tratados como `Sob consulta`:
 - Nao ha personalizacao por usuario.
 - Nao ha calculo de CTR dentro do recomendador.
 - O score e uma pontuacao por regras, nao uma probabilidade.
+- URL e imagem nao entram na pontuacao; elas sao usadas apenas na resposta da
+  API e no widget.
+- As relacoes da Fase 4.5 ainda sao curadoria inicial e precisam de validacao
+  qualitativa com a Kouzina.
 - Fuzzy e ontologia continuam fora desta fase.
 
 ## Diferenca para fuzzy futuro
@@ -116,7 +144,6 @@ Fuzzy e ontologia continuam fora desta fase.
 
 ## Proximos passos
 
-- Revisar qualidade do catalogo oficial autorizado importado.
-- Revisar pesos com exemplos reais da Kouzina.
+- Validar qualitativamente as novas relacoes com exemplos reais da Kouzina.
 - Usar `manual_product_relations` para ajustes editoriais simples.
 - Medir impressoes, cliques e CTR antes de qualquer camada fuzzy.

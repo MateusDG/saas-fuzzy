@@ -2,7 +2,7 @@
 
 MVP comercial minimo de recomendacao para o site Kouzina Club.
 
-Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3 e 4.4:
+Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4 e 4.5:
 
 - API FastAPI minima.
 - `GET /health`.
@@ -15,6 +15,7 @@ Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3 e 4.4:
 - Importacao local de catalogo oficial autorizado da Kouzina via CSV exportado.
 - Curadoria de catalogo oficial para inferir tipo, ambiente, marca, categoria e voltagem.
 - Suporte a URL Tray e imagem principal/adicional do catalogo oficial autorizado.
+- Relacoes complementares comerciais iniciais para tipos reais do catalogo oficial.
 
 Fora de escopo: fuzzy, ontologia, integracao Tray, painel, login, deploy,
 ranking sofisticado, crawler, scraping e multi-loja completo.
@@ -289,10 +290,10 @@ Qualidade do catalogo oficial: `docs/CATALOG_QUALITY.md`.
 
 ## Proxima fase
 
-A proxima fase recomendada e revisar relacoes complementares e pesos do ranking
-v0 usando exemplos reais do catalogo oficial autorizado. Fuzzy, ontologia, Tray,
-painel, login e deploy continuam fora ate autorizacao explicita em fases
-posteriores.
+A proxima fase recomendada e validar qualitativamente as relacoes do ranking v0
+com exemplos reais da Kouzina e, depois, medir impressoes, cliques e CTR. Fuzzy,
+ontologia, Tray, painel, login e deploy continuam fora ate autorizacao explicita
+em fases posteriores.
 
 ## Rodar testes
 

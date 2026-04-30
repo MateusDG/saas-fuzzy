@@ -187,6 +187,59 @@ def test_complementary_candidate_scores_higher() -> None:
     assert complementary_score > unrelated_score
 
 
+def test_catalog_commercial_relationships_score_as_complementary() -> None:
+    relationship_cases = [
+        ("Cuba", "Misturador"),
+        ("Misturador", "Cuba"),
+        ("Acess\u00f3rio de Coifa", "Coifa"),
+        ("Churrasqueira", "Cervejeira"),
+        ("Churrasqueira", "Adega"),
+        ("Churrasqueira", "Forno de Pizza"),
+        ("Churrasqueira", "Queimador"),
+        ("Coifa", "Acess\u00f3rio de Coifa"),
+        ("Forno", "Gaveta Aquecida"),
+        ("Refrigerador", "Freezer"),
+        ("Rangetop", "Queimador"),
+    ]
+
+    for current_type, candidate_type in relationship_cases:
+        current = make_product("current", product_type=current_type)
+        complementary = make_product("complementary", product_type=candidate_type)
+        unrelated = make_product("unrelated", product_type="Secadora")
+
+        complementary_score, complementary_reasons = score_candidate(current, complementary)
+        unrelated_score, _ = score_candidate(current, unrelated)
+
+        assert complementary_score > unrelated_score
+        assert "Produto complementar ao item visualizado." in complementary_reasons
+
+
+def test_environment_is_not_treated_as_product_type_relationship() -> None:
+    current = make_product("current", product_type="Micro-ondas")
+    environment_as_type = make_product("environment", product_type="Cozinha Gourmet")
+
+    _, reasons = score_candidate(current, environment_as_type)
+
+    assert "Produto complementar ao item visualizado." not in reasons
+
+
+def test_cuba_recommends_misturador_without_returning_current_product() -> None:
+    current = make_product("cuba", product_type="Cuba")
+    same_product = make_product("cuba", product_type="Cuba")
+    misturador = make_product("misturador", product_type="Misturador")
+    coifa = make_product("coifa", product_type="Coifa")
+
+    recommendations = recommend_from_catalog(
+        current,
+        [same_product, coifa, misturador],
+    )
+
+    recommendation_ids = [item.product_id for item in recommendations]
+    assert recommendation_ids[0] == "misturador"
+    assert "cuba" not in recommendation_ids
+    assert "Produto complementar ao item visualizado." in recommendations[0].reason
+
+
 def test_unavailable_candidate_is_penalized() -> None:
     current = make_product("current", product_type="Coifa")
     available = make_product("available", product_type="Cooktop", available=True)

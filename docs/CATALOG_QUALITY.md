@@ -47,6 +47,14 @@ Depois da Fase 4.3 e com o CSV atualizado da Fase 4.4:
 - Produtos sem `product_type`: 0.
 - Produtos sem `environment`: 0.
 
+Na Fase 4.5:
+
+- Tipos novos como `Cuba`, `Misturador`, `Queimador`, `Acessorio de Coifa`,
+  `Acessorio de Cozinha`, `Gaveta Aquecida`, `Micro-ondas`, `Lava-loucas`,
+  `Refrigerador`, `Freezer`, `Cafeteira`, `Forno de Pizza`, `Maquina de Gelo`,
+  `Cervejeira`, `Frigobar` e `Rangetop` passaram a ter relacoes
+  complementares iniciais no recomendador v0.
+
 ## Tipos Inferidos Principais
 
 - Coifa: 50.
@@ -104,9 +112,9 @@ Depois da Fase 4.3 e com o CSV atualizado da Fase 4.4:
 - Existem 52 produtos sem voltagem preenchida.
 - Existem 52 produtos sob consulta; eles ficam com `price=null` e nao entram
   na regra de preco proximo.
-- Alguns tipos novos, como `Cuba`, `Misturador`, `Queimador` e
-  `Acessorio de Coifa`, ainda nao possuem relacoes complementares especificas
-  no recomendador v0.
+- As relacoes complementares da Fase 4.5 ainda sao curadoria inicial. Elas
+  devem ser revisadas com exemplos comerciais reais e, futuramente, podem ser
+  refinadas por relacoes manuais ou metricas de clique.
 
 ## Fora De Escopo
 
