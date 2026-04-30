@@ -12,7 +12,14 @@ from app.database import Base, get_db
 from app.main import app
 from app.models import Product, RecommendationEvent, Store
 from app.recommender import recommend_from_catalog, score_candidate
-from app.seed import import_products_from_csv
+from app.seed import (
+    infer_environment,
+    infer_product_type,
+    import_products_from_csv,
+    normalize_brand,
+    normalize_category,
+    normalize_voltage,
+)
 
 
 @pytest.fixture()
@@ -338,6 +345,49 @@ def test_official_kouzina_csv_import_maps_expected_fields(
     assert adega.installation_type == "Embutir"
     assert adega.product_type == "Adega"
     assert adega.environment == "Espa\u00e7o Gourmet"
+
+
+def test_catalog_curadoria_infers_additional_product_types() -> None:
+    cases = [
+        ("Espa\u00e7o Gourmet", "Queimador Lateral \u00e0 G\u00e1s GLP Dual Burner", "Queimador"),
+        ("Espa\u00e7o Gourmet", "Dispenser de \u00c1gua Sole Built-in 60cm 220v", "Dispenser de \u00c1gua"),
+        ("Cozinha", "Kit Exaustor p/ Extractor Mythos", "Acess\u00f3rio de Coifa"),
+        ("Cozinha", "Cafeteira de Embutir Mythos 45cm 220V", "Cafeteira"),
+        ("Cozinha", "Cuba de Embutir Kubus Onyx Fragranite 62x42", "Cuba"),
+        ("Cozinha", "Misturador Monocomando de Mesa A\u00e7o Inox", "Misturador"),
+        ("Cozinha", "Set Azeite & Vinagre Cl\u00e1ssico 17 cm", "Acess\u00f3rio de Cozinha"),
+        ("Fornos", "Forno de Pizza de Embutir", "Forno de Pizza"),
+        ("Gavetas Refrigeradoras", "Gaveta Refrigerada 24 pol", "Gaveta Refrigerada"),
+        ("Maquina de Gelo", "M\u00e1quina de Gelo Built-in", "M\u00e1quina de Gelo"),
+    ]
+
+    for category, name, expected_type in cases:
+        assert infer_product_type(category, name) == expected_type
+
+
+def test_catalog_curadoria_infers_environment_from_product_type() -> None:
+    assert infer_environment("Cuba", None, None) == "Cozinha Gourmet"
+    assert infer_environment("Misturador", None, None) == "Cozinha Gourmet"
+    assert infer_environment("Queimador", None, None) == "Espa\u00e7o Gourmet"
+    assert infer_environment("Forno de Pizza", None, None) == "Espa\u00e7o Gourmet"
+    assert infer_environment("Gaveta Refrigerada", None, None) == "Refrigera\u00e7\u00e3o"
+    assert infer_environment("Secadora", None, None) == "Lavanderia"
+
+
+def test_catalog_curadoria_normalizes_brand_category_and_voltage() -> None:
+    assert normalize_brand(" Bert.   Ital ") == "Bertazzoni It\u00e1lia"
+    assert normalize_brand("Bertazzoni Italia") == "Bertazzoni It\u00e1lia"
+    assert normalize_brand("  Franke   Premium  ") == "Franke Premium"
+    assert normalize_brand("") is None
+
+    assert normalize_category(" Espaco   Gourmet ") == "Espa\u00e7o Gourmet"
+    assert normalize_category("Refrigeracao") == "Refrigera\u00e7\u00e3o"
+    assert normalize_category("") is None
+
+    assert normalize_voltage("220v, 220v") == "220v"
+    assert normalize_voltage("127v, 127v") == "127v"
+    assert normalize_voltage("Bivolt") == "bivolt"
+    assert normalize_voltage("127v, 220v") == "bivolt"
 
 
 def test_replace_products_keeps_events(

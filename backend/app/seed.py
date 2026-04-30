@@ -21,11 +21,89 @@ PRICE_INFORMED = "Pre\u00e7o informado"
 PRICE_NOT_INFORMED = "Pre\u00e7o n\u00e3o informado"
 SOB_CONSULTA = "Sob consulta"
 
+CATEGORY_ALIASES = {
+    "adegas": "Adegas",
+    "cervejeiras": "Cervejeiras",
+    "churrasqueiras": "Churrasqueiras",
+    "coifas": "Coifas",
+    "cooktops": "Cooktops",
+    "cozinha": "Cozinha",
+    "espaco gourmet": "Espa\u00e7o Gourmet",
+    "fornos": "Fornos",
+    "frigobar": "Frigobar",
+    "gavetas refrigeradoras": "Gavetas Refrigeradoras",
+    "lava loucas": "Lava-lou\u00e7as",
+    "lavadoras": "Lavadoras",
+    "micro ondas": "Micro-Ondas",
+    "refrigeracao": "Refrigera\u00e7\u00e3o",
+    "secadoras": "Secadoras",
+}
+
+PRODUCT_TYPE_RULES = [
+    ({"forno de pizza", "pizza"}, "Forno de Pizza"),
+    ({"gaveta refrigerada", "gavetas refrigeradoras"}, "Gaveta Refrigerada"),
+    ({"maquina de gelo"}, "M\u00e1quina de Gelo"),
+    ({"gaveta aquecida"}, "Gaveta Aquecida"),
+    ({"lava loucas", "lava louca"}, "Lava-lou\u00e7as"),
+    ({"micro ondas", "microondas"}, "Micro-ondas"),
+    ({"queimador lateral", "side burner", "power burner", "dual burner"}, "Queimador"),
+    ({"dispenser de agua"}, "Dispenser de \u00c1gua"),
+    ({"kit exaustor", "kit filtragem", "depurador", "extractor"}, "Acess\u00f3rio de Coifa"),
+    ({"cafeteira"}, "Cafeteira"),
+    ({"misturador"}, "Misturador"),
+    ({"cuba"}, "Cuba"),
+    ({"set azeite", "azeite", "vinagre"}, "Acess\u00f3rio de Cozinha"),
+    ({"churrasqueiras", "churrasqueira"}, "Churrasqueira"),
+    ({"cervejeiras", "cervejeira"}, "Cervejeira"),
+    ({"frigobar", "frigobares"}, "Frigobar"),
+    ({"adegas", "adega"}, "Adega"),
+    ({"coifas", "coifa"}, "Coifa"),
+    ({"cooktops", "cooktop"}, "Cooktop"),
+    ({"fornos", "forno"}, "Forno"),
+    ({"domino", "dominos"}, "Domino"),
+    ({"refrigeradores", "refrigerador", "refrigeracao"}, "Refrigerador"),
+    ({"fogoes", "fogao"}, "Fog\u00e3o"),
+    ({"rangertop", "rangetop"}, "Rangetop"),
+    ({"freezer"}, "Freezer"),
+    ({"secadoras", "secadora"}, "Secadora"),
+    ({"lavadoras", "lavadora"}, "Lavadora"),
+    ({"conjugadas", "conjugada"}, "Conjugada"),
+]
+
+KITCHEN_TYPES = {
+    "acessorio de coifa",
+    "acessorio de cozinha",
+    "cafeteira",
+    "coifa",
+    "cooktop",
+    "cuba",
+    "domino",
+    "fogao",
+    "forno",
+    "gaveta aquecida",
+    "lava loucas",
+    "micro ondas",
+    "misturador",
+    "rangetop",
+}
+GOURMET_TYPES = {
+    "adega",
+    "cervejeira",
+    "churrasqueira",
+    "dispenser de agua",
+    "forno de pizza",
+    "frigobar",
+    "maquina de gelo",
+    "queimador",
+}
+REFRIGERATION_TYPES = {"freezer", "gaveta refrigerada", "refrigerador"}
+LAUNDRY_TYPES = {"conjugada", "lavadora", "secadora"}
+
 
 def parse_optional_text(value: str | None) -> str | None:
     if value is None:
         return None
-    stripped = value.strip()
+    stripped = " ".join(value.strip().split())
     return stripped or None
 
 
@@ -106,9 +184,17 @@ def normalize_brand(value: str | None) -> str | None:
     brand = parse_optional_text(value)
     if brand is None:
         return None
-    if normalize_key(brand) == "bert. ital":
+    normalized = normalize_key(brand)
+    if normalized in {"bert. ital", "bertazzoni italia"}:
         return "Bertazzoni It\u00e1lia"
     return brand
+
+
+def normalize_category(value: str | None) -> str | None:
+    category = parse_optional_text(value)
+    if category is None:
+        return None
+    return CATEGORY_ALIASES.get(normalize_key(category), category)
 
 
 def normalize_voltage(value: str | None) -> str | None:
@@ -125,6 +211,8 @@ def normalize_voltage(value: str | None) -> str | None:
     if len(unique_voltages) == 1:
         return unique_voltages[0]
     if unique_voltages:
+        if "220v" in unique_voltages and any(voltage in unique_voltages for voltage in {"110v", "127v"}):
+            return "bivolt"
         return ", ".join(unique_voltages)
 
     return " ".join(value.lower().split())
@@ -161,36 +249,23 @@ def text_has_any(value: str, terms: set[str]) -> bool:
 def infer_product_type(category: str | None, name: str | None) -> str | None:
     normalized = normalize_key(f"{category or ''} {name or ''}")
 
-    checks = [
-        ({"gaveta refrigerada", "gavetas refrigeradoras"}, "Gaveta Refrigerada"),
-        ({"maquina de gelo"}, "M\u00e1quina de Gelo"),
-        ({"gaveta aquecida"}, "Gaveta Aquecida"),
-        ({"lava loucas", "lava louca"}, "Lava-lou\u00e7as"),
-        ({"micro ondas", "microondas"}, "Micro-ondas"),
-        ({"churrasqueiras", "churrasqueira"}, "Churrasqueira"),
-        ({"cervejeiras", "cervejeira"}, "Cervejeira"),
-        ({"frigobar", "frigobares"}, "Frigobar"),
-        ({"adegas", "adega"}, "Adega"),
-        ({"coifas", "coifa"}, "Coifa"),
-        ({"cooktops", "cooktop"}, "Cooktop"),
-        ({"fornos", "forno"}, "Forno"),
-        ({"domino", "dominos"}, "Domino"),
-        ({"refrigeradores", "refrigerador", "refrigeracao"}, "Refrigerador"),
-        ({"fogoes", "fogao"}, "Fog\u00e3o"),
-        ({"rangertop", "rangetop"}, "Rangetop"),
-        ({"freezer"}, "Freezer"),
-        ({"secadoras", "secadora"}, "Secadora"),
-        ({"lavadoras", "lavadora"}, "Lavadora"),
-        ({"conjugadas", "conjugada"}, "Conjugada"),
-    ]
-
-    for terms, product_type in checks:
+    for terms, product_type in PRODUCT_TYPE_RULES:
         if text_has_any(normalized, terms):
             return product_type
     return None
 
 
 def infer_environment(product_type: str | None, category: str | None, name: str | None) -> str | None:
+    normalized_type = normalize_key(product_type)
+    if normalized_type in KITCHEN_TYPES:
+        return "Cozinha Gourmet"
+    if normalized_type in GOURMET_TYPES:
+        return "Espa\u00e7o Gourmet"
+    if normalized_type in REFRIGERATION_TYPES:
+        return "Refrigera\u00e7\u00e3o"
+    if normalized_type in LAUNDRY_TYPES:
+        return "Lavanderia"
+
     normalized = normalize_key(f"{product_type or ''} {category or ''} {name or ''}")
 
     if text_has_any(normalized, {"lavanderia", "lavadora", "secadora", "conjugada"}):
@@ -288,7 +363,7 @@ def product_values_from_internal_row(row: dict[str, str]) -> dict[str, object]:
 
 def product_values_from_official_row(row: dict[str, str], row_number: int) -> dict[str, object]:
     name = parse_optional_text(get_row_value(row, "nome produto")) or "Produto sem nome"
-    category = parse_optional_text(get_row_value(row, "nome categoria"))
+    category = normalize_category(get_row_value(row, "nome categoria"))
     price = parse_decimal(get_row_value(row, "preco venda"))
     raw_price = parse_optional_text(get_row_value(row, "preco venda"))
 

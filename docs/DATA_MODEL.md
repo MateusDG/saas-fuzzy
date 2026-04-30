@@ -4,7 +4,8 @@ Na Fase 2, a API conecta ao PostgreSQL usando `DATABASE_URL`, cria tabelas no
 startup do MVP e permite importar produtos por CSV. Na Fase 4, o CSV ficticio
 foi ampliado para cerca de 30 produtos seedados de desenvolvimento. Na Fase
 4.2, o importador passou a aceitar tambem o catalogo oficial autorizado da
-Kouzina em arquivo local.
+Kouzina em arquivo local. Na Fase 4.3, a importacao oficial recebeu regras de
+curadoria para reduzir tipos e ambientes ausentes.
 
 ## Dados Mockados
 
@@ -66,9 +67,21 @@ Campos sem coluna direta sao inferidos:
 - `width_cm` por padroes no nome, como `60cm` ou `90 cm`;
 - `installation_type` por termos como `Embutir`, `Built-in`, `Ilha`,
   `Parede` e `Domino`;
-- `product_type` por categoria e nome;
+- `product_type` por categoria e nome, incluindo tipos como Coifa, Cooktop,
+  Forno, Adega, Cervejeira, Frigobar, Refrigerador, Micro-ondas, Lava-loucas,
+  Maquina de Gelo, Forno de Pizza, Gaveta Refrigerada, Gaveta Aquecida,
+  Rangetop, Freezer, Lavadora, Secadora, Conjugada, Cuba, Misturador,
+  Queimador, Cafeteira e Acessorio de Coifa;
 - `environment` por tipo, categoria e nome;
 - `premium_level` por faixa de preco.
+
+A Fase 4.3 tambem normaliza:
+
+- marca `Bert. Ital` e `Bertazzoni Italia` para `Bertazzoni Itália`;
+- espacos duplicados em marca e categoria;
+- categorias conhecidas sem acento para forma padronizada;
+- voltagens repetidas, como `220v, 220v`, para `220v`;
+- voltagens multiplas diferentes, como `127v, 220v`, para `bivolt`.
 
 Regra comercial de preco:
 
