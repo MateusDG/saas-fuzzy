@@ -13,6 +13,5 @@ build/
 *.log
 .DS_Store
 data/products_kouzina_official.csv
-data/products_kouzina_official_corrigido.csv
 data/products_kouzina_official.xlsx
 data/raw/

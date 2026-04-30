@@ -38,11 +38,12 @@ premium_level
 O arquivo oficial local esperado e:
 
 ```text
-data/products_kouzina_official_corrigido.csv
+data/products_kouzina_official.csv
 ```
 
 Ele deve estar em UTF-8 com BOM e usar separador `;`. Esse arquivo e ignorado
-pelo Git porque contem um snapshot autorizado do catalogo real da Kouzina.
+pelo Git porque contem um snapshot autorizado do catalogo real da Kouzina. Nao
+deve ser commitado sem decisao explicita.
 
 O importador detecta automaticamente o formato:
 

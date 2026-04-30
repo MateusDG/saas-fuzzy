@@ -38,7 +38,7 @@ widget/
   kouzina-reco.js
 data/
   products_seed.csv
-  products_kouzina_official_corrigido.csv  # local, ignorado pelo Git
+  products_kouzina_official.csv  # local, ignorado pelo Git
 docker-compose.yml
 .env.example
 ```
@@ -113,14 +113,13 @@ A Fase 4.2 adiciona suporte ao CSV oficial autorizado da Kouzina. Coloque o
 arquivo local em:
 
 ```text
-data/products_kouzina_official_corrigido.csv
+data/products_kouzina_official.csv
 ```
 
 Esse arquivo nao deve ser versionado. O `.gitignore` ignora:
 
 ```text
 data/products_kouzina_official.csv
-data/products_kouzina_official_corrigido.csv
 data/products_kouzina_official.xlsx
 data/raw/
 ```
@@ -134,14 +133,14 @@ Para importar sem apagar produtos existentes:
 
 ```powershell
 cd backend
-python -m app.seed --file ../data/products_kouzina_official_corrigido.csv
+python -m app.seed --file ../data/products_kouzina_official.csv
 ```
 
 Para substituir o catalogo da loja padrao antes de importar:
 
 ```powershell
 cd backend
-python -m app.seed --file ../data/products_kouzina_official_corrigido.csv --replace-products
+python -m app.seed --file ../data/products_kouzina_official.csv --replace-products
 ```
 
 `--replace-products` remove produtos e relacoes manuais da loja `kouzina`, mas

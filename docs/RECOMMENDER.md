@@ -81,7 +81,7 @@ Isso preserva o funcionamento do widget e evita quebrar a pagina da loja.
 
 ## Catalogo Oficial Autorizado
 
-Quando o banco recebe o arquivo `data/products_kouzina_official_corrigido.csv`,
+Quando o banco recebe o arquivo `data/products_kouzina_official.csv`,
 o ranking v0 usa os produtos reais autorizados da Kouzina. O algoritmo nao muda
 o contrato da API: cada item recomendado continua retornando `product_id`,
 `name`, `url`, `image_url`, `price`, `reason` e `score`.

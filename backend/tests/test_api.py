@@ -309,7 +309,7 @@ def test_official_kouzina_csv_import_maps_expected_fields(
     db_session: Session,
     tmp_path: Path,
 ) -> None:
-    official_csv = tmp_path / "products_kouzina_official_corrigido.csv"
+    official_csv = tmp_path / "products_kouzina_official.csv"
     write_official_fixture(official_csv)
 
     imported_count = import_products_from_csv(db_session, official_csv)
@@ -360,7 +360,7 @@ def test_replace_products_keeps_events(
         )
     )
     db_session.commit()
-    official_csv = tmp_path / "products_kouzina_official_corrigido.csv"
+    official_csv = tmp_path / "products_kouzina_official.csv"
     write_official_fixture(official_csv)
 
     imported_count = import_products_from_csv(

@@ -3,10 +3,6 @@
 Resumo gerado na Fase 4.2 apos importar o arquivo oficial autorizado local
 disponivel em `data/products_kouzina_official.csv`.
 
-Observacao: o caminho esperado `data/products_kouzina_official_corrigido.csv`
-nao estava presente no workspace durante esta validacao. O importador ja
-suporta esse caminho e esse formato quando o arquivo estiver disponivel.
-
 ## Resumo
 
 - Total de produtos importados: 318.
