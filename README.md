@@ -2,7 +2,7 @@
 
 MVP comercial minimo de recomendacao para o site Kouzina Club.
 
-Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4 e 4.5:
+Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.5 e 4.6:
 
 - API FastAPI minima.
 - `GET /health`.
@@ -16,6 +16,7 @@ Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4 e 4
 - Curadoria de catalogo oficial para inferir tipo, ambiente, marca, categoria e voltagem.
 - Suporte a URL Tray e imagem principal/adicional do catalogo oficial autorizado.
 - Relacoes complementares comerciais iniciais para tipos reais do catalogo oficial.
+- Relatorio CSV para revisao qualitativa das recomendacoes.
 
 Fora de escopo: fuzzy, ontologia, integracao Tray, painel, login, deploy,
 ranking sofisticado, crawler, scraping e multi-loja completo.
@@ -288,12 +289,40 @@ disponiveis para recomendacao.
 Detalhes: `docs/RECOMMENDER.md`.
 Qualidade do catalogo oficial: `docs/CATALOG_QUALITY.md`.
 
+## Relatorio de revisao qualitativa
+
+A Fase 4.6 gera um CSV para que a Kouzina revise manualmente se as
+recomendacoes do ranking v0 fazem sentido comercial. O relatorio nao usa dados
+pessoais e deve ser analisado antes de qualquer etapa de metricas, CTR, fuzzy ou
+ontologia.
+
+Com o banco rodando e o catalogo oficial importado:
+
+```powershell
+cd backend
+python -m app.review_recommendations
+```
+
+Arquivo gerado:
+
+```text
+reports/recommendation_review.csv
+```
+
+Tambem e possivel filtrar por tipo:
+
+```powershell
+python -m app.review_recommendations --product-type Churrasqueira --top-k 4
+```
+
+Detalhes: `docs/RECOMMENDATION_REVIEW.md`.
+
 ## Proxima fase
 
-A proxima fase recomendada e validar qualitativamente as relacoes do ranking v0
-com exemplos reais da Kouzina e, depois, medir impressoes, cliques e CTR. Fuzzy,
-ontologia, Tray, painel, login e deploy continuam fora ate autorizacao explicita
-em fases posteriores.
+A proxima fase recomendada e preencher o relatorio de revisao qualitativa com a
+Kouzina e usar os comentarios para ajustar curadoria editorial. Depois disso,
+medir impressoes, cliques e CTR. Fuzzy, ontologia, Tray, painel, login e deploy
+continuam fora ate autorizacao explicita em fases posteriores.
 
 ## Rodar testes
 

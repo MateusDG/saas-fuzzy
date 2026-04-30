@@ -12,6 +12,7 @@ from app.database import Base, get_db
 from app.main import app
 from app.models import Product, RecommendationEvent, Store
 from app.recommender import recommend_from_catalog, score_candidate
+from app.review_recommendations import REVIEW_COLUMNS, generate_review_csv
 from app.seed import (
     infer_environment,
     infer_product_type,
@@ -358,6 +359,81 @@ def test_recommendations_include_image_url_when_candidate_has_image(
     assert candidate["url"] == "https://www.kouzinaclub.com.br/"
     assert candidate["reason"]
     assert isinstance(candidate["score"], float)
+
+
+def test_review_recommendations_generates_expected_csv(
+    db_session: Session,
+    tmp_path: Path,
+) -> None:
+    store = create_store(db_session)
+    create_db_product(
+        db_session,
+        store,
+        "source-cuba",
+        name="Cuba de teste",
+        product_type="Cuba",
+        category="Cozinha",
+        brand="Franke",
+        price=Decimal("4000.00"),
+        url="https://www.kouzinaclub.com.br/cuba",
+        image_url="https://cdn.example.com/cuba.jpg",
+    )
+    create_db_product(
+        db_session,
+        store,
+        "recommended-misturador",
+        name="Misturador de teste",
+        product_type="Misturador",
+        category="Cozinha",
+        brand="Franke",
+        price=Decimal("3500.00"),
+        url="https://www.kouzinaclub.com.br/misturador",
+        image_url="https://cdn.example.com/misturador.jpg",
+    )
+    create_db_product(
+        db_session,
+        store,
+        "candidate-coifa",
+        name="Coifa de teste",
+        product_type="Coifa",
+        category="Coifas",
+        brand="Elettromec",
+        price=Decimal("9000.00"),
+        url="https://www.kouzinaclub.com.br/coifa",
+        image_url="https://cdn.example.com/coifa.jpg",
+    )
+    db_session.commit()
+    output_path = tmp_path / "recommendation_review.csv"
+
+    source_count, row_count = generate_review_csv(
+        db_session,
+        output_path=output_path,
+        limit_products=1,
+        top_k=2,
+        product_type="Cuba",
+    )
+
+    assert source_count == 1
+    assert row_count == 2
+    assert output_path.exists()
+
+    import csv
+
+    with output_path.open("r", encoding="utf-8", newline="") as csv_file:
+        reader = csv.DictReader(csv_file)
+        rows = list(reader)
+
+    assert reader.fieldnames == REVIEW_COLUMNS
+    assert rows
+    assert all(row["source_product_id"] != row["recommended_product_id"] for row in rows)
+    assert all(row["score"] for row in rows)
+    assert all(row["reason"] for row in rows)
+    assert all(row["source_url"] for row in rows)
+    assert all(row["recommended_url"] for row in rows)
+    assert any(row["recommended_image_url"] for row in rows)
+    assert rows[0]["recommended_product_id"] == "recommended-misturador"
+    assert rows[0]["reviewer_rating"] == ""
+    assert rows[0]["reviewer_comment"] == ""
 
 
 def test_recommendations_fallback_when_current_product_is_missing(
