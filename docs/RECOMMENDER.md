@@ -8,6 +8,10 @@ learning, LLM ou dados pessoais.
 
 A meta desta fase e retornar produtos plausiveis para o widget, com score e
 motivo textual, mantendo fallback mockado quando o catalogo nao for suficiente.
+Na Fase 4, o CSV seedado passou a conter cerca de 30 produtos ficticios ou
+semi-realistas para exercitar melhor essas regras. Na Fase 4.2, o mesmo
+recomendador passou a operar tambem sobre catalogo oficial autorizado importado
+localmente por CSV.
 
 ## Como funciona
 
@@ -31,7 +35,7 @@ Cada candidato recebe uma pontuacao bruta:
 
 A faixa de preco e considerada proxima quando a diferenca relativa entre o preco
 do produto atual e o preco do candidato e menor ou igual a 30%. Se algum preco
-estiver vazio, zerado ou invalido, essa regra nao pontua.
+estiver vazio, nulo, zerado, invalido ou sob consulta, essa regra nao pontua.
 
 ## Relacoes complementares
 
@@ -56,6 +60,7 @@ por exemplo:
 ```text
 Produto complementar ao item visualizado.
 Produto disponivel.
+Produto sob consulta.
 Mesma voltagem do produto atual.
 Faixa de preco proxima.
 Mesma marca do produto atual.
@@ -74,13 +79,31 @@ A API retorna fallback mockado quando:
 
 Isso preserva o funcionamento do widget e evita quebrar a pagina da loja.
 
+## Catalogo Oficial Autorizado
+
+Quando o banco recebe o arquivo `data/products_kouzina_official_corrigido.csv`,
+o ranking v0 usa os produtos reais autorizados da Kouzina. O algoritmo nao muda
+o contrato da API: cada item recomendado continua retornando `product_id`,
+`name`, `url`, `image_url`, `price`, `reason` e `score`.
+
+Produtos com `Preco venda = 0.00` sao tratados como `Sob consulta`:
+
+- `price` fica `null`;
+- `available` permanece `true`;
+- a regra de preco proximo nao e aplicada;
+- o reason pode incluir `Produto sob consulta.`;
+- o produto nao e penalizado como indisponivel.
+
 ## Limitacoes
 
-- O catalogo atual ainda e pequeno.
+- O catalogo pode ser seedado para desenvolvimento ou oficial autorizado local.
+- Atributos ausentes no CSV oficial reduzem pontuacoes possiveis, por exemplo
+  voltagem, imagem, largura e URL quando nao forem exportados.
 - Nao ha relacoes manuais persistidas sendo usadas no ranking.
 - Nao ha personalizacao por usuario.
 - Nao ha calculo de CTR dentro do recomendador.
 - O score e uma pontuacao por regras, nao uma probabilidade.
+- Fuzzy e ontologia continuam fora desta fase.
 
 ## Diferenca para fuzzy futuro
 
@@ -93,7 +116,7 @@ Fuzzy e ontologia continuam fora desta fase.
 
 ## Proximos passos
 
-- Ampliar `data/products_seed.csv` para 30 a 50 produtos reais ou semi-reais.
+- Revisar qualidade do catalogo oficial autorizado importado.
 - Revisar pesos com exemplos reais da Kouzina.
 - Usar `manual_product_relations` para ajustes editoriais simples.
 - Medir impressoes, cliques e CTR antes de qualquer camada fuzzy.

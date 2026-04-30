@@ -1,5 +1,6 @@
 from collections.abc import Generator
 from decimal import Decimal
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -61,6 +62,7 @@ def make_product(external_id: str, **overrides):
         "environment": "Cozinha Gourmet",
         "product_type": "Coifa",
         "premium_level": "Premium",
+        "availability_text": "Disponivel",
     }
     defaults.update(overrides)
     return SimpleNamespace(**defaults)
@@ -274,9 +276,9 @@ def test_seed_imports_csv_and_recommendations_use_catalog(
 ) -> None:
     imported_count = import_products_from_csv(db_session)
 
-    assert imported_count == 3
+    assert imported_count >= 30
     assert db_session.query(Store).count() == 1
-    assert db_session.query(Product).count() == 3
+    assert db_session.query(Product).count() == imported_count
 
     response = client.get("/recommendations", params={"product_id": "mock-001"})
 
@@ -285,3 +287,118 @@ def test_seed_imports_csv_and_recommendations_use_catalog(
     recommendation_ids = [item["product_id"] for item in payload["recommendations"]]
     assert "mock-001" not in recommendation_ids
     assert recommendation_ids
+
+
+def write_official_fixture(path: Path) -> None:
+    path.write_text(
+        "\ufeffC\u00f3digo categoria;Nome produto;Pre\u00e7o venda;Marca;Modelo;"
+        "Refer\u00eancia;Endere\u00e7o do Produto (URL Tray);Imagens adicionais;"
+        "Nome categoria;Caracter\u00edstica: Voltagem;"
+        "Caracter\u00edstica: Queimadores;Caracter\u00edstica: Por Departamento\n"
+        "100;Coifa Ilha 90cm Teste;0.00;Bert. Ital;BI90;REAL-001;"
+        "https://www.kouzinaclub.com.br/coifa-real;"
+        "https://cdn.example.com/coifa.jpg|https://cdn.example.com/coifa-2.jpg;"
+        "Coifas;220v, 220v;;Cozinha\n"
+        "101;Adega 45 Garrafas Built-in 60cm Teste;;Crissair;AD45;;"
+        "https://www.kouzinaclub.com.br/adega-real;;Adegas;Bivolt;;Espa\u00e7o Gourmet\n",
+        encoding="utf-8-sig",
+    )
+
+
+def test_official_kouzina_csv_import_maps_expected_fields(
+    db_session: Session,
+    tmp_path: Path,
+) -> None:
+    official_csv = tmp_path / "products_kouzina_official_corrigido.csv"
+    write_official_fixture(official_csv)
+
+    imported_count = import_products_from_csv(db_session, official_csv)
+
+    assert imported_count == 2
+
+    coifa = db_session.query(Product).filter(Product.external_id == "REAL-001").one()
+    assert coifa.name == "Coifa Ilha 90cm Teste"
+    assert coifa.url == "https://www.kouzinaclub.com.br/coifa-real"
+    assert coifa.image_url == "https://cdn.example.com/coifa.jpg"
+    assert coifa.brand == "Bertazzoni It\u00e1lia"
+    assert coifa.price is None
+    assert coifa.available is True
+    assert coifa.availability_text == "Sob consulta"
+    assert coifa.voltage == "220v"
+    assert coifa.width_cm == Decimal("90.00")
+    assert coifa.installation_type == "Ilha"
+    assert coifa.product_type == "Coifa"
+    assert coifa.environment == "Cozinha Gourmet"
+    assert coifa.premium_level == "Sob consulta"
+
+    adega = db_session.query(Product).filter(Product.external_id == "kouzina-auto-2").one()
+    assert adega.price is None
+    assert adega.availability_text == "Pre\u00e7o n\u00e3o informado"
+    assert adega.voltage == "bivolt"
+    assert adega.installation_type == "Embutir"
+    assert adega.product_type == "Adega"
+    assert adega.environment == "Espa\u00e7o Gourmet"
+
+
+def test_replace_products_keeps_events(
+    db_session: Session,
+    tmp_path: Path,
+) -> None:
+    store = create_store(db_session)
+    create_db_product(db_session, store, "old-product")
+    db_session.add(
+        RecommendationEvent(
+            store_id=store.id,
+            event_type="page_view",
+            anonymous_id="anon_123",
+            session_id="sess_123",
+            page_url="http://localhost:5500/demo.html",
+            product_external_id="old-product",
+            widget_id="product-page",
+            recommended_product_external_id=None,
+            event_metadata={},
+        )
+    )
+    db_session.commit()
+    official_csv = tmp_path / "products_kouzina_official_corrigido.csv"
+    write_official_fixture(official_csv)
+
+    imported_count = import_products_from_csv(
+        db_session,
+        official_csv,
+        replace_products=True,
+    )
+
+    assert imported_count == 2
+    assert db_session.query(Product).filter(Product.external_id == "old-product").count() == 0
+    assert db_session.query(RecommendationEvent).count() == 1
+
+
+def test_recommender_ignores_close_price_when_price_is_null() -> None:
+    current = make_product("current", product_type="Coifa", price=None)
+    candidate = make_product(
+        "candidate",
+        product_type="Cooktop",
+        price=Decimal("1000.00"),
+    )
+
+    _, reasons = score_candidate(current, candidate)
+
+    assert "Faixa de preco proxima." not in reasons
+
+
+def test_recommender_can_recommend_sob_consulta_product() -> None:
+    current = make_product("current", product_type="Coifa", price=Decimal("1000.00"))
+    candidate = make_product(
+        "sob-consulta",
+        product_type="Cooktop",
+        price=None,
+        available=True,
+        availability_text="Sob consulta",
+    )
+
+    score, reasons = score_candidate(current, candidate)
+
+    assert score > 0
+    assert "Produto sob consulta." in reasons
+    assert "Produto indisponivel no catalogo." not in reasons

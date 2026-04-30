@@ -17,6 +17,7 @@ class ProductLike(Protocol):
     environment: str | None
     product_type: str | None
     premium_level: str | None
+    availability_text: str | None
 
 
 COMPLEMENTARY_TYPES = {
@@ -120,12 +121,16 @@ def score_candidate(
         score += 30
         reasons.append("Produto complementar ao item visualizado.")
 
+    is_sob_consulta = normalize_text(getattr(candidate, "availability_text", None)) == "sob consulta"
     if candidate.available:
         score += 20
-        reasons.append("Produto disponivel.")
+        if is_sob_consulta:
+            reasons.append("Produto sob consulta.")
+        else:
+            reasons.append("Produto disponivel.")
     else:
         score -= 30
-        reasons.append("Produto indisponivel no catalogo inicial.")
+        reasons.append("Produto indisponivel no catalogo.")
 
     if values_match(current_product.voltage, candidate.voltage):
         score += 15
@@ -148,7 +153,7 @@ def score_candidate(
         reasons.append("Faixa premium semelhante.")
 
     if not reasons:
-        reasons.append("Produto selecionado do catalogo inicial da Kouzina.")
+        reasons.append("Produto selecionado do catalogo da Kouzina.")
 
     return score, reasons
 

@@ -2,4 +2,30 @@ external_id,name,url,image_url,category,subcategory,brand,price,available,availa
 mock-001,Cooktop premium compativel,https://www.kouzinaclub.com.br/,,Cozinha,Cooktops,Elettromec,9990.00,true,Disponivel para simulacao,220V,90,Embutir,Cooktop,Cozinha Gourmet,Premium
 mock-002,Forno de embutir recomendado,https://www.kouzinaclub.com.br/,,Cozinha,Fornos,Elettromec,8490.00,true,Disponivel para simulacao,220V,60,Embutir,Forno,Cozinha Planejada,Premium
 mock-003,Adega climatizada compacta,https://www.kouzinaclub.com.br/,,Espaco Gourmet,Adegas,Crissair,6990.00,true,Disponivel para simulacao,220V,45,Piso,Adega,Espaco Gourmet,Premium
-
+mock-004,Coifa de ilha premium demo 90cm,https://www.kouzinaclub.com.br/,,Cozinha,Coifas,Elettromec,10990.00,true,Disponivel para simulacao,220V,90,Ilha,Coifa,Cozinha Gourmet,Premium
+mock-005,Coifa de parede gourmet demo 90cm,https://www.kouzinaclub.com.br/,,Cozinha,Coifas,LineaPro,7990.00,true,Disponivel para simulacao,220V,90,Parede,Coifa,Cozinha Gourmet,Intermediario
+mock-006,Cooktop cinco queimadores demo inox,https://www.kouzinaclub.com.br/,,Cozinha,Cooktops,LineaPro,8990.00,true,Disponivel para simulacao,220V,75,Embutir,Cooktop,Cozinha Gourmet,Premium
+mock-007,Cooktop domino inducao demo,https://www.kouzinaclub.com.br/,,Cozinha,Cooktops,GourmetLab,4290.00,true,Disponivel para simulacao,220V,30,Embutir,Cooktop,Cozinha Planejada,Intermediario
+mock-008,Domino grill gourmet demo 30cm,https://www.kouzinaclub.com.br/,,Cozinha,Dominos,GourmetLab,7290.00,true,Disponivel para simulacao,220V,30,Embutir,Domino,Cozinha Gourmet,Premium
+mock-009,Forno combinado premium demo 60cm,https://www.kouzinaclub.com.br/,,Cozinha,Fornos,Elettromec,10490.00,true,Disponivel para simulacao,220V,60,Embutir,Forno,Cozinha Gourmet,Premium
+mock-010,Forno compacto demo 45cm,https://www.kouzinaclub.com.br/,,Cozinha,Fornos,BravaHome,5890.00,true,Disponivel para simulacao,110V,45,Embutir,Forno,Cozinha Planejada,Intermediario
+mock-011,Adega dual zone demo 46 garrafas,https://www.kouzinaclub.com.br/,,Espaco Gourmet,Adegas,Crissair,11990.00,true,Disponivel para simulacao,220V,60,Embutir,Adega,Espaco Gourmet,Premium
+mock-012,Adega slim demo 24 garrafas,https://www.kouzinaclub.com.br/,,Espaco Gourmet,Adegas,PrimeHaus,5490.00,true,Disponivel para simulacao,110V,45,Piso,Adega,Espaco Gourmet,Intermediario
+mock-013,Cervejeira gourmet demo 135 litros,https://www.kouzinaclub.com.br/,,Espaco Gourmet,Cervejeiras,PrimeHaus,6290.00,true,Disponivel para simulacao,220V,60,Piso,Cervejeira,Espaco Gourmet,Intermediario
+mock-014,Cervejeira premium demo embutir,https://www.kouzinaclub.com.br/,,Espaco Gourmet,Cervejeiras,Crissair,8990.00,true,Disponivel para simulacao,220V,60,Embutir,Cervejeira,Espaco Gourmet,Premium
+mock-015,Frigobar gourmet demo vidro,https://www.kouzinaclub.com.br/,,Espaco Gourmet,Frigobares,PrimeHaus,3990.00,true,Disponivel para simulacao,110V,50,Piso,Frigobar,Espaco Gourmet,Intermediario
+mock-016,Frigobar premium demo embutir,https://www.kouzinaclub.com.br/,,Espaco Gourmet,Frigobares,GourmetLab,6590.00,true,Disponivel para simulacao,220V,60,Embutir,Frigobar,Espaco Gourmet,Premium
+mock-017,Churrasqueira gas demo bancada,https://www.kouzinaclub.com.br/,,Area Gourmet,Churrasqueiras,BravaHome,12990.00,true,Disponivel para simulacao,220V,80,Bancada,Churrasqueira,Area Churrasco,Premium
+mock-018,Churrasqueira eletrica demo embutir,https://www.kouzinaclub.com.br/,,Area Gourmet,Churrasqueiras,GourmetLab,7490.00,true,Disponivel para simulacao,220V,60,Embutir,Churrasqueira,Varanda Gourmet,Intermediario
+mock-019,Coifa compacta demo 60cm,https://www.kouzinaclub.com.br/,,Cozinha,Coifas,BravaHome,4290.00,true,Disponivel para simulacao,110V,60,Parede,Coifa,Cozinha Planejada,Basico
+mock-020,Coifa ilha black demo 120cm,https://www.kouzinaclub.com.br/,,Cozinha,Coifas,GourmetLab,14990.00,false,Indisponivel para validar penalizacao,220V,120,Ilha,Coifa,Cozinha Gourmet,Premium
+mock-021,Cooktop seis queimadores demo,https://www.kouzinaclub.com.br/,,Cozinha,Cooktops,Elettromec,11990.00,true,Disponivel para simulacao,220V,90,Embutir,Cooktop,Cozinha Gourmet,Premium
+mock-022,Cooktop basico demo quatro bocas,https://www.kouzinaclub.com.br/,,Cozinha,Cooktops,BravaHome,3290.00,true,Disponivel para simulacao,110V,60,Embutir,Cooktop,Cozinha Planejada,Basico
+mock-023,Forno pirolitico demo premium,https://www.kouzinaclub.com.br/,,Cozinha,Fornos,LineaPro,12990.00,false,Indisponivel para validar penalizacao,220V,60,Embutir,Forno,Cozinha Gourmet,Premium
+mock-024,Forno vapor demo gourmet,https://www.kouzinaclub.com.br/,,Cozinha,Fornos,GourmetLab,9690.00,true,Disponivel para simulacao,220V,60,Embutir,Forno,Cozinha Gourmet,Premium
+mock-025,Domino teppan demo inox,https://www.kouzinaclub.com.br/,,Cozinha,Dominos,LineaPro,8490.00,true,Disponivel para simulacao,220V,30,Embutir,Domino,Cozinha Gourmet,Premium
+mock-026,Domino vitroceramico demo,https://www.kouzinaclub.com.br/,,Cozinha,Dominos,BravaHome,4990.00,false,Indisponivel para validar penalizacao,220V,30,Embutir,Domino,Cozinha Planejada,Intermediario
+mock-027,Adega grande demo 92 garrafas,https://www.kouzinaclub.com.br/,,Espaco Gourmet,Adegas,GourmetLab,15990.00,true,Disponivel para simulacao,220V,70,Piso,Adega,Espaco Gourmet,Premium
+mock-028,Cervejeira compacta demo varanda,https://www.kouzinaclub.com.br/,,Espaco Gourmet,Cervejeiras,BravaHome,4690.00,false,Indisponivel para validar penalizacao,110V,50,Piso,Cervejeira,Varanda Gourmet,Intermediario
+mock-029,Frigobar baixo demo area gourmet,https://www.kouzinaclub.com.br/,,Espaco Gourmet,Frigobares,LineaPro,5290.00,true,Disponivel para simulacao,220V,60,Piso,Frigobar,Espaco Gourmet,Intermediario
+mock-030,Churrasqueira premium demo rotisserie,https://www.kouzinaclub.com.br/,,Area Gourmet,Churrasqueiras,Crissair,18990.00,true,Disponivel para simulacao,220V,100,Embutir,Churrasqueira,Espaco Gourmet,Premium

@@ -101,3 +101,7 @@ Resposta:
 
 Em respostas vindas do catalogo, `score` e a pontuacao bruta do ranking v0. Em
 respostas de fallback, `score` continua sendo o valor mockado da Fase 1.
+
+No catalogo oficial autorizado, produtos com preco `Sob consulta` retornam
+`price: null`. Eles continuam disponiveis para recomendacao, mas nao recebem
+pontuacao por faixa de preco proxima.

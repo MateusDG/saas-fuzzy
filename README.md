@@ -2,7 +2,7 @@
 
 MVP comercial minimo de recomendacao para o site Kouzina Club.
 
-Este repositorio implementa a base local das Fases 1, 2 e 3:
+Este repositorio implementa a base local das Fases 1, 2, 3, 4 e 4.2:
 
 - API FastAPI minima.
 - `GET /health`.
@@ -11,7 +11,8 @@ Este repositorio implementa a base local das Fases 1, 2 e 3:
 - Widget JavaScript puro.
 - Demo local do widget.
 - PostgreSQL via Docker Compose.
-- CSV com 3 produtos mockados.
+- CSV seedado com cerca de 30 produtos mockados ou semi-realistas.
+- Importacao local de catalogo oficial autorizado da Kouzina via CSV exportado.
 
 Fora de escopo: fuzzy, ontologia, integracao Tray, painel, login, deploy,
 ranking sofisticado, crawler, scraping e multi-loja completo.
@@ -37,6 +38,7 @@ widget/
   kouzina-reco.js
 data/
   products_seed.csv
+  products_kouzina_official_corrigido.csv  # local, ignorado pelo Git
 docker-compose.yml
 .env.example
 ```
@@ -93,7 +95,8 @@ http://localhost:8000
 
 ## Criar tabelas e importar produtos
 
-A API tenta criar as tabelas no startup. Para importar o catalogo inicial:
+A API tenta criar as tabelas no startup. Sem argumentos, o seed importa o
+catalogo ficticio de desenvolvimento em `data/products_seed.csv`:
 
 ```powershell
 cd backend
@@ -103,6 +106,51 @@ python -m app.seed
 O seed cria a loja padrao Kouzina e importa `data/products_seed.csv`. A
 importacao e idempotente por `external_id`, entao pode ser rodada mais de uma
 vez sem duplicar produtos.
+
+## Importar catalogo oficial autorizado
+
+A Fase 4.2 adiciona suporte ao CSV oficial autorizado da Kouzina. Coloque o
+arquivo local em:
+
+```text
+data/products_kouzina_official_corrigido.csv
+```
+
+Esse arquivo nao deve ser versionado. O `.gitignore` ignora:
+
+```text
+data/products_kouzina_official.csv
+data/products_kouzina_official_corrigido.csv
+data/products_kouzina_official.xlsx
+data/raw/
+```
+
+O CSV oficial deve estar em UTF-8 com BOM, usar separador `;` e conter colunas
+como `Nome produto`, `Preco venda`, `Referencia`, `Nome categoria`, marca,
+voltagem, URL Tray e imagens. A leitura usa `utf-8-sig`; nao converta para
+Latin-1 ou ISO-8859-1.
+
+Para importar sem apagar produtos existentes:
+
+```powershell
+cd backend
+python -m app.seed --file ../data/products_kouzina_official_corrigido.csv
+```
+
+Para substituir o catalogo da loja padrao antes de importar:
+
+```powershell
+cd backend
+python -m app.seed --file ../data/products_kouzina_official_corrigido.csv --replace-products
+```
+
+`--replace-products` remove produtos e relacoes manuais da loja `kouzina`, mas
+preserva `recommendation_events`.
+
+Regra comercial: no CSV oficial, `Preco venda` igual a `0.00` significa
+`Sob consulta`. Nesse caso a API salva `price` como `null`, mantem
+`available=true` e nao usa o produto como item barato na regra de preco
+proximo.
 
 ## Testar API
 
@@ -128,10 +176,16 @@ Documentacao interativa:
 http://localhost:8000/docs
 ```
 
-Recomendacoes:
+Recomendacoes com seed ficticio:
 
 ```bash
 curl "http://localhost:8000/recommendations?product_id=mock-001&widget_id=product-page"
+```
+
+Recomendacoes com catalogo oficial importado:
+
+```bash
+curl "http://localhost:8000/recommendations?product_id=119&widget_id=product-page"
 ```
 
 Quando houver produtos importados no banco e o `product_id` existir no catalogo,
@@ -178,6 +232,10 @@ O widget deve:
 - usar `localStorage` para `anonymous_id`;
 - usar `sessionStorage` para `session_id`.
 
+O `widget/demo.html` esta configurado para demonstrar um `product_id` real do
+catalogo oficial autorizado (`119`). Se apenas o seed ficticio estiver
+importado, a API usa fallback mockado para manter o demo funcional.
+
 ## Eventos permitidos
 
 Nesta fase, a API aceita somente:
@@ -214,13 +272,17 @@ O recomendador v0 pontua candidatos por complementaridade de tipo, disponibilida
 mesma voltagem, preco proximo, mesma marca, mesmo ambiente e nivel premium
 semelhante. O proprio produto visualizado nunca deve ser retornado.
 
+Quando o preco de um produto oficial estiver nulo ou como `Sob consulta`, a
+regra de faixa de preco proxima nao pontua. Produtos sob consulta continuam
+disponiveis para recomendacao.
+
 Detalhes: `docs/RECOMMENDER.md`.
 
 ## Proxima fase
 
-A proxima fase deve ampliar o catalogo e preparar validacao controlada do uso do
-widget. Fuzzy, ontologia, Tray, painel, login e deploy continuam fora ate
-autorizacao explicita em fases posteriores.
+A proxima fase recomendada e validar a qualidade do catalogo oficial importado
+e revisar pesos/regras com exemplos reais. Fuzzy, ontologia, Tray, painel,
+login e deploy continuam fora ate autorizacao explicita em fases posteriores.
 
 ## Rodar testes
 
