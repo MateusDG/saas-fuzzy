@@ -176,8 +176,24 @@ def first_image_url(value: str | None) -> str | None:
     if match:
         return match.group(0)
 
-    first_value = re.split(r"[,;|]", value, maxsplit=1)[0]
-    return parse_optional_text(first_value)
+    return None
+
+
+def image_url_from_official_row(row: dict[str, str]) -> str | None:
+    image_columns = (
+        "imagem principal",
+        "imagem 2",
+        "imagem 3",
+        "imagem 4",
+        "imagens adicionais",
+        "imagem",
+        "image_url",
+    )
+    for column in image_columns:
+        image_url = first_image_url(get_row_value(row, column))
+        if image_url is not None:
+            return image_url
+    return None
 
 
 def normalize_brand(value: str | None) -> str | None:
@@ -399,7 +415,7 @@ def product_values_from_official_row(row: dict[str, str], row_number: int) -> di
             )
             or DEFAULT_STORE_DOMAIN
         ),
-        "image_url": first_image_url(get_row_value(row, "imagens adicionais", "image_url")),
+        "image_url": image_url_from_official_row(row),
         "category": category,
         "subcategory": category,
         "brand": normalize_brand(get_row_value(row, "marca")),

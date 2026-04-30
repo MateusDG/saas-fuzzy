@@ -2,7 +2,7 @@
 
 MVP comercial minimo de recomendacao para o site Kouzina Club.
 
-Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2 e 4.3:
+Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3 e 4.4:
 
 - API FastAPI minima.
 - `GET /health`.
@@ -14,6 +14,7 @@ Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2 e 4.3:
 - CSV seedado com cerca de 30 produtos mockados ou semi-realistas.
 - Importacao local de catalogo oficial autorizado da Kouzina via CSV exportado.
 - Curadoria de catalogo oficial para inferir tipo, ambiente, marca, categoria e voltagem.
+- Suporte a URL Tray e imagem principal/adicional do catalogo oficial autorizado.
 
 Fora de escopo: fuzzy, ontologia, integracao Tray, painel, login, deploy,
 ranking sofisticado, crawler, scraping e multi-loja completo.
@@ -127,8 +128,14 @@ data/raw/
 
 O CSV oficial deve estar em UTF-8 com BOM, usar separador `;` e conter colunas
 como `Nome produto`, `Preco venda`, `Referencia`, `Nome categoria`, marca,
-voltagem, URL Tray e imagens. A leitura usa `utf-8-sig`; nao converta para
-Latin-1 ou ISO-8859-1.
+voltagem, URL Tray e imagens. A Fase 4.4 suporta `Imagem principal`,
+`Imagem 2`, `Imagem 3`, `Imagem 4`, `Imagens adicionais`, `Imagem` e
+`image_url`. A leitura usa `utf-8-sig`; nao converta para Latin-1 ou
+ISO-8859-1.
+
+O importador salva apenas URLs. Ele nao baixa imagens e nao salva arquivo ou
+binario no banco. Quando mais de uma imagem estiver disponivel, o sistema usa a
+primeira URL valida seguindo a ordem das colunas acima.
 
 Para importar sem apagar produtos existentes:
 
@@ -225,6 +232,7 @@ http://localhost:5500/demo.html
 O widget deve:
 
 - renderizar recomendacoes do catalogo quando o produto existir;
+- exibir imagem quando a recomendacao tiver `image_url`;
 - manter fallback mockado quando a API ou o catalogo nao estiverem disponiveis;
 - enviar `page_view`;
 - enviar `recommendation_impression`;
@@ -281,9 +289,10 @@ Qualidade do catalogo oficial: `docs/CATALOG_QUALITY.md`.
 
 ## Proxima fase
 
-A proxima fase recomendada e validar a qualidade do catalogo oficial importado
-e revisar pesos/regras com exemplos reais. Fuzzy, ontologia, Tray, painel,
-login e deploy continuam fora ate autorizacao explicita em fases posteriores.
+A proxima fase recomendada e revisar relacoes complementares e pesos do ranking
+v0 usando exemplos reais do catalogo oficial autorizado. Fuzzy, ontologia, Tray,
+painel, login e deploy continuam fora ate autorizacao explicita em fases
+posteriores.
 
 ## Rodar testes
 

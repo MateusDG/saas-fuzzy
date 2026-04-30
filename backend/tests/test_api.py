@@ -262,6 +262,51 @@ def test_recommendations_are_sorted_by_score(
     assert scores == sorted(scores, reverse=True)
 
 
+def test_recommendations_include_image_url_when_candidate_has_image(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    store = create_store(db_session)
+    create_db_product(
+        db_session,
+        store,
+        "current-coifa",
+        product_type="Coifa",
+        price=Decimal("10000.00"),
+    )
+    create_db_product(
+        db_session,
+        store,
+        "candidate-cooktop",
+        image_url="https://cdn.example.com/cooktop.jpg",
+        product_type="Cooktop",
+        price=Decimal("9500.00"),
+    )
+    create_db_product(
+        db_session,
+        store,
+        "candidate-forno",
+        image_url=None,
+        product_type="Forno",
+        price=Decimal("12000.00"),
+    )
+    db_session.commit()
+
+    response = client.get("/recommendations", params={"product_id": "current-coifa"})
+
+    assert response.status_code == 200
+    payload = response.json()
+    candidate = next(
+        item
+        for item in payload["recommendations"]
+        if item["product_id"] == "candidate-cooktop"
+    )
+    assert candidate["image_url"] == "https://cdn.example.com/cooktop.jpg"
+    assert candidate["url"] == "https://www.kouzinaclub.com.br/"
+    assert candidate["reason"]
+    assert isinstance(candidate["score"], float)
+
+
 def test_recommendations_fallback_when_current_product_is_missing(
     client: TestClient,
     db_session: Session,
@@ -297,19 +342,82 @@ def test_seed_imports_csv_and_recommendations_use_catalog(
 
 
 def write_official_fixture(path: Path) -> None:
-    path.write_text(
-        "\ufeffC\u00f3digo categoria;Nome produto;Pre\u00e7o venda;Marca;Modelo;"
-        "Refer\u00eancia;Endere\u00e7o do Produto (URL Tray);Imagens adicionais;"
-        "Nome categoria;Caracter\u00edstica: Voltagem;"
-        "Caracter\u00edstica: Queimadores;Caracter\u00edstica: Por Departamento\n"
-        "100;Coifa Ilha 90cm Teste;0.00;Bert. Ital;BI90;REAL-001;"
-        "https://www.kouzinaclub.com.br/coifa-real;"
-        "https://cdn.example.com/coifa.jpg|https://cdn.example.com/coifa-2.jpg;"
-        "Coifas;220v, 220v;;Cozinha\n"
-        "101;Adega 45 Garrafas Built-in 60cm Teste;;Crissair;AD45;;"
-        "https://www.kouzinaclub.com.br/adega-real;;Adegas;Bivolt;;Espa\u00e7o Gourmet\n",
-        encoding="utf-8-sig",
-    )
+    header = [
+        "C\u00f3digo categoria",
+        "Nome produto",
+        "Imagem principal",
+        "Imagem 2",
+        "Imagem 3",
+        "Imagem 4",
+        "Pre\u00e7o venda",
+        "Marca",
+        "Modelo",
+        "Refer\u00eancia",
+        "Endere\u00e7o do Produto (URL Tray)",
+        "Imagens adicionais",
+        "Nome categoria",
+        "Caracter\u00edstica: Voltagem",
+        "Caracter\u00edstica: Queimadores",
+        "Caracter\u00edstica: Por Departamento",
+    ]
+    rows = [
+        [
+            "100",
+            "Coifa Ilha 90cm Teste",
+            "https://cdn.example.com/coifa-principal.jpg|https://cdn.example.com/coifa-principal-2.jpg",
+            "https://cdn.example.com/coifa-2.jpg",
+            "",
+            "",
+            "0.00",
+            "Bert. Ital",
+            "BI90",
+            "REAL-001",
+            "https://www.kouzinaclub.com.br/coifa-real",
+            "https://cdn.example.com/coifa-extra.jpg|https://cdn.example.com/coifa-extra-2.jpg",
+            "Coifas",
+            "220v, 220v",
+            "",
+            "Cozinha",
+        ],
+        [
+            "101",
+            "Adega 45 Garrafas Built-in 60cm Teste",
+            "",
+            "https://cdn.example.com/adega-2.jpg",
+            "",
+            "",
+            "",
+            "Crissair",
+            "AD45",
+            "",
+            "https://www.kouzinaclub.com.br/adega-real",
+            "",
+            "Adegas",
+            "Bivolt",
+            "",
+            "Espa\u00e7o Gourmet",
+        ],
+        [
+            "102",
+            "Forno sem imagem 60cm Teste",
+            "",
+            "",
+            "",
+            "",
+            "8500.00",
+            "Elettromec",
+            "FOR60",
+            "REAL-003",
+            "https://www.kouzinaclub.com.br/forno-sem-imagem",
+            "",
+            "Fornos",
+            "220v",
+            "",
+            "Cozinha",
+        ],
+    ]
+    lines = [";".join(header), *[";".join(row) for row in rows]]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8-sig")
 
 
 def test_official_kouzina_csv_import_maps_expected_fields(
@@ -321,12 +429,12 @@ def test_official_kouzina_csv_import_maps_expected_fields(
 
     imported_count = import_products_from_csv(db_session, official_csv)
 
-    assert imported_count == 2
+    assert imported_count == 3
 
     coifa = db_session.query(Product).filter(Product.external_id == "REAL-001").one()
     assert coifa.name == "Coifa Ilha 90cm Teste"
     assert coifa.url == "https://www.kouzinaclub.com.br/coifa-real"
-    assert coifa.image_url == "https://cdn.example.com/coifa.jpg"
+    assert coifa.image_url == "https://cdn.example.com/coifa-principal.jpg"
     assert coifa.brand == "Bertazzoni It\u00e1lia"
     assert coifa.price is None
     assert coifa.available is True
@@ -339,12 +447,18 @@ def test_official_kouzina_csv_import_maps_expected_fields(
     assert coifa.premium_level == "Sob consulta"
 
     adega = db_session.query(Product).filter(Product.external_id == "kouzina-auto-2").one()
+    assert adega.url == "https://www.kouzinaclub.com.br/adega-real"
+    assert adega.image_url == "https://cdn.example.com/adega-2.jpg"
     assert adega.price is None
     assert adega.availability_text == "Pre\u00e7o n\u00e3o informado"
     assert adega.voltage == "bivolt"
     assert adega.installation_type == "Embutir"
     assert adega.product_type == "Adega"
     assert adega.environment == "Espa\u00e7o Gourmet"
+
+    forno = db_session.query(Product).filter(Product.external_id == "REAL-003").one()
+    assert forno.image_url is None
+    assert forno.price == Decimal("8500.00")
 
 
 def test_catalog_curadoria_infers_additional_product_types() -> None:
@@ -419,7 +533,7 @@ def test_replace_products_keeps_events(
         replace_products=True,
     )
 
-    assert imported_count == 2
+    assert imported_count == 3
     assert db_session.query(Product).filter(Product.external_id == "old-product").count() == 0
     assert db_session.query(RecommendationEvent).count() == 1
 

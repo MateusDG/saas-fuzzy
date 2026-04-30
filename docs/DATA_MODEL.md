@@ -5,7 +5,8 @@ startup do MVP e permite importar produtos por CSV. Na Fase 4, o CSV ficticio
 foi ampliado para cerca de 30 produtos seedados de desenvolvimento. Na Fase
 4.2, o importador passou a aceitar tambem o catalogo oficial autorizado da
 Kouzina em arquivo local. Na Fase 4.3, a importacao oficial recebeu regras de
-curadoria para reduzir tipos e ambientes ausentes.
+curadoria para reduzir tipos e ambientes ausentes. Na Fase 4.4, o importador
+passou a mapear URL Tray e imagens do CSV oficial atualizado.
 
 ## Dados Mockados
 
@@ -56,7 +57,9 @@ Mapeamento principal da exportacao oficial:
 - `Referencia` -> `external_id`; se vazia, gera `kouzina-auto-<numero-da-linha>`;
 - `Nome produto` -> `name`;
 - `Endereco do Produto (URL Tray)` -> `url`;
-- `Imagens adicionais` -> `image_url`, usando a primeira URL;
+- `Imagem principal`, `Imagem 2`, `Imagem 3`, `Imagem 4`,
+  `Imagens adicionais`, `Imagem` ou `image_url` -> `image_url`, usando a
+  primeira URL valida encontrada nessa ordem;
 - `Marca` -> `brand`;
 - `Preco venda` -> `price`;
 - `Nome categoria` -> `category` e `subcategory`;
@@ -82,6 +85,11 @@ A Fase 4.3 tambem normaliza:
 - categorias conhecidas sem acento para forma padronizada;
 - voltagens repetidas, como `220v, 220v`, para `220v`;
 - voltagens multiplas diferentes, como `127v, 220v`, para `bivolt`.
+
+Na Fase 4.4, as imagens continuam sendo apenas URLs armazenadas em
+`products.image_url`. O sistema nao baixa imagens, nao salva arquivo local e
+nao persiste binario no banco. Produtos sem imagem continuam sendo importados
+normalmente com `image_url=null`.
 
 Regra comercial de preco:
 
@@ -184,7 +192,8 @@ recomendador.
 ## Limitacoes Do Catalogo Oficial Local
 
 - Alguns atributos continuam inferidos a partir do nome e da categoria.
-- Alguns produtos podem nao ter imagem no arquivo exportado.
+- Alguns produtos podem nao ter imagem no arquivo exportado; nesses casos
+  `image_url` fica nulo.
 - Alguns produtos podem nao ter voltagem preenchida.
 - Produtos `Sob consulta` nao devem ser tratados como baratos, pois `price`
   fica nulo.
