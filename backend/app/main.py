@@ -33,7 +33,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.app_name,
     version="0.1.0",
-    description="API minima para recomendacoes mockadas da Kouzina Reco.",
+    description="API minima para recomendacoes da Kouzina Reco.",
     lifespan=lifespan,
 )
 
@@ -102,19 +102,29 @@ def get_recommendations(
     db: Session = Depends(get_db),
 ) -> RecommendationResponse:
     try:
-        products = db.query(Product).filter(Product.active.is_(True)).all()
-        if not products:
-            raise LookupError("empty catalog")
+        if not product_id:
+            raise LookupError("missing product_id")
 
-        current_product = None
-        if product_id:
-            current_product = (
-                db.query(Product)
-                .filter(Product.external_id == product_id, Product.active.is_(True))
-                .one_or_none()
+        current_product = (
+            db.query(Product)
+            .filter(Product.external_id == product_id, Product.active.is_(True))
+            .one_or_none()
+        )
+        if current_product is None:
+            raise LookupError("current product not found")
+
+        products = (
+            db.query(Product)
+            .filter(
+                Product.store_id == current_product.store_id,
+                Product.active.is_(True),
             )
+            .all()
+        )
+        if len(products) <= 1:
+            raise LookupError("insufficient candidates")
 
-        recommendations = recommend_from_catalog(current_product, products)
+        recommendations = recommend_from_catalog(current_product, products, limit=4)
         if recommendations:
             return RecommendationResponse(
                 widget_title="Complete seu projeto",

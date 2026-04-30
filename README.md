@@ -2,12 +2,12 @@
 
 MVP comercial minimo de recomendacao para o site Kouzina Club.
 
-Este repositório implementa a base local das Fases 1 e 2:
+Este repositorio implementa a base local das Fases 1, 2 e 3:
 
 - API FastAPI minima.
 - `GET /health`.
 - `POST /events` com validacao de payload e persistencia em PostgreSQL.
-- `GET /recommendations` usando catalogo importado, com fallback mockado.
+- `GET /recommendations` usando catalogo importado e ranking v0 por regras, com fallback mockado.
 - Widget JavaScript puro.
 - Demo local do widget.
 - PostgreSQL via Docker Compose.
@@ -57,7 +57,7 @@ Copy-Item .env.example .env
 
 ## Rodar PostgreSQL
 
-O banco e usado pela Fase 2 para produtos e eventos.
+O banco e usado pelas Fases 2 e 3 para produtos, eventos e ranking v0.
 
 ```bash
 docker compose up -d
@@ -131,12 +131,13 @@ http://localhost:8000/docs
 Recomendacoes:
 
 ```bash
-curl "http://localhost:8000/recommendations?product_id=12345&widget_id=product-page"
+curl "http://localhost:8000/recommendations?product_id=mock-001&widget_id=product-page"
 ```
 
-Quando houver produtos importados no banco, a resposta usa o catalogo. Se o
-banco estiver vazio ou indisponivel, a API usa fallback mockado para manter o
-widget funcionando.
+Quando houver produtos importados no banco e o `product_id` existir no catalogo,
+a resposta usa o ranking v0 por regras. Se o banco estiver vazio, indisponivel
+ou o produto atual nao existir, a API usa fallback mockado para manter o widget
+funcionando.
 
 Evento mockado no PowerShell:
 
@@ -169,7 +170,8 @@ http://localhost:5500/demo.html
 
 O widget deve:
 
-- renderizar recomendacoes mockadas;
+- renderizar recomendacoes do catalogo quando o produto existir;
+- manter fallback mockado quando a API ou o catalogo nao estiverem disponiveis;
 - enviar `page_view`;
 - enviar `recommendation_impression`;
 - enviar `recommendation_click` ao clicar em uma recomendacao;
@@ -206,10 +208,19 @@ O MVP coleta somente dados anonimos e tecnicos:
 Nao coletar nome, CPF, e-mail, telefone, endereco, dados de pagamento ou
 conteudo de formularios.
 
+## Recomendador v0
+
+O recomendador v0 pontua candidatos por complementaridade de tipo, disponibilidade,
+mesma voltagem, preco proximo, mesma marca, mesmo ambiente e nivel premium
+semelhante. O proprio produto visualizado nunca deve ser retornado.
+
+Detalhes: `docs/RECOMMENDER.md`.
+
 ## Proxima fase
 
-A proxima fase deve evoluir o catalogo e o recomendador v0 por regras. Fuzzy,
-ontologia, Tray, painel, login e deploy continuam fora ate fases posteriores.
+A proxima fase deve ampliar o catalogo e preparar validacao controlada do uso do
+widget. Fuzzy, ontologia, Tray, painel, login e deploy continuam fora ate
+autorizacao explicita em fases posteriores.
 
 ## Rodar testes
 

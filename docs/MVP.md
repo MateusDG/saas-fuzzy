@@ -6,7 +6,7 @@ Entregar uma primeira versao local, simples e mensuravel do Kouzina Reco:
 
 - API FastAPI minima;
 - widget JavaScript puro;
-- recomendacoes via catalogo inicial, com fallback mockado;
+- recomendacoes via catalogo inicial e ranking v0 por regras, com fallback mockado;
 - eventos anonimos persistidos quando o banco esta disponivel;
 - PostgreSQL preparado via Docker Compose.
 
@@ -35,9 +35,22 @@ Inclui:
 - fallback mockado quando o banco estiver vazio ou indisponivel;
 - testes basicos.
 
+## Escopo da Fase 3
+
+Inclui:
+
+- recomendador v0 por regras semanticas simples;
+- pontuacao por complementaridade, disponibilidade, voltagem, preco, marca,
+  ambiente e nivel premium;
+- exclusao do proprio produto visualizado;
+- ordenacao por score decrescente;
+- motivos textuais para cada recomendacao;
+- fallback mockado quando o produto atual nao existir ou nao houver candidatos;
+- testes do ranking e do endpoint `/recommendations`.
+
 ## Fora de escopo nesta fase
 
-- ranking real;
+- ranking sofisticado;
 - fuzzy;
 - ontologia;
 - integracao Tray;
@@ -51,7 +64,7 @@ Inclui:
 - API roda localmente;
 - `/health` responde;
 - `/events` valida payload e salva evento quando o banco esta disponivel;
-- `/recommendations` retorna recomendacoes do catalogo ou fallback mockado;
+- `/recommendations` retorna recomendacoes do catalogo ordenadas por ranking v0 ou fallback mockado;
 - `demo.html` carrega o widget;
 - widget renderiza recomendacoes;
 - widget envia `page_view`;
