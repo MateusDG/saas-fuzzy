@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Mapa visual local do MVP Kouzina Reco.">
+    <title>Kouzina Reco — Mapa Visual do MVP</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+
+    <header class="site-header" aria-label="Navegação principal">
+      <a class="brand-mark" href="#topo" aria-label="Kouzina Reco">
+        <span class="brand-symbol" aria-hidden="true">KR</span>
+        <span>Mapa Visual</span>
+      </a>
+      <nav class="top-nav" aria-label="Seções do mapa">
+        <a href="#fases">Fases</a>
+        <a href="#arquitetura">Arquitetura</a>
+        <a href="#api">API</a>
+        <a href="#testador">Testador</a>
+        <a href="#lgpd">LGPD</a>
+      </nav>
+    </header>
+
+    <main id="conteudo">
+      <section class="hero section-band" id="topo">
+        <div class="hero-grid">
+          <div class="hero-copy reveal">
+            <p class="eyebrow">Kouzina Reco MVP</p>
+            <h1>Kouzina Reco — Mapa Visual do MVP</h1>
+            <p class="hero-lead">
+              Um guia local, visual e didático para entender o produto, a API, o widget,
+              os eventos, o catálogo e o ranking v0 já implementados.
+            </p>
+            <div class="hero-actions" aria-label="Atalhos principais">
+              <a class="button primary" href="#testador">Testar API</a>
+              <a class="button secondary" href="#arquitetura">Ver arquitetura</a>
+            </div>
+          </div>
+
+          <aside class="hero-panel reveal" aria-label="Estado atual do MVP">
+            <div class="status-orbit" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <p class="panel-label">Estado atual</p>
+            <ul class="signal-list">
+              <li><strong>Widget</strong><span>JavaScript puro local</span></li>
+              <li><strong>API</strong><span>FastAPI em localhost:8000</span></li>
+              <li><strong>Eventos</strong><span>Validados e persistidos</span></li>
+              <li><strong>Ranking</strong><span>v0 por regras editoriais</span></li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section-block overview" id="visao-geral" aria-labelledby="visao-geral-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Visão geral</p>
+          <h2 id="visao-geral-title">O que este MVP resolve agora</h2>
+          <p>
+            O Kouzina Reco é um MVP de recomendação para e-commerce premium. A versão
+            atual prioriza o fluxo mensurável: widget instalado, API respondendo,
+            eventos anônimos registrados, catálogo importado e ranking v0 explicável.
+          </p>
+        </div>
+        <div class="overview-grid">
+          <article class="feature-card reveal">
+            <span class="feature-number">01</span>
+            <h3>Produto funcional</h3>
+            <p>O widget identifica contexto de produto, busca recomendações e renderiza cards no demo local.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-number">02</span>
+            <h3>Medição de uso</h3>
+            <p>A API aceita `page_view`, `product_view`, `recommendation_impression` e `recommendation_click`.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-number">03</span>
+            <h3>Catálogo e ranking</h3>
+            <p>Produtos seedados ou oficiais autorizados alimentam um ranking v0 por regras comerciais.</p>
+          </article>
+          <article class="feature-card future-card reveal">
+            <span class="feature-number">Futuro</span>
+            <h3>Fuzzy e ontologia</h3>
+            <p>Continuam como evolução acadêmica posterior, sem execução ativa nesta etapa.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="fases" aria-labelledby="fases-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Linha do tempo</p>
+          <h2 id="fases-title">Fases implementadas e fronteiras futuras</h2>
+          <p>O projeto evoluiu de um mock local para catálogo oficial autorizado e revisão qualitativa.</p>
+        </div>
+
+        <div class="timeline" aria-label="Linha do tempo das fases do MVP">
+          <article class="phase-card done reveal">
+            <span class="badge done">feito</span>
+            <h3>Fase 1</h3>
+            <p>API mínima, widget local, eventos mockados e recomendações mockadas.</p>
+          </article>
+          <article class="phase-card done reveal">
+            <span class="badge done">feito</span>
+            <h3>Fase 2</h3>
+            <p>PostgreSQL, modelos, persistência de eventos e seed idempotente.</p>
+          </article>
+          <article class="phase-card done reveal">
+            <span class="badge done">feito</span>
+            <h3>Fase 3</h3>
+            <p>Catálogo, ranking v0 por regras e recomendações reais quando há produto no banco.</p>
+          </article>
+          <article class="phase-card done reveal">
+            <span class="badge local">local</span>
+            <h3>Fases 4.2 a 4.6</h3>
+            <p>Importação oficial autorizada, curadoria, imagens, relações complementares e CSV de revisão.</p>
+          </article>
+        </div>
+
+        <div class="future-rail reveal" aria-label="Itens futuros bloqueados sem autorização">
+          <h3>Futuro ou bloqueado sem autorização explícita</h3>
+          <div class="future-tags">
+            <span>fuzzy v1</span>
+            <span>ontologia formal</span>
+            <span>deploy</span>
+            <span>painel</span>
+            <span>integração Tray</span>
+            <span>multi-loja</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block" id="arquitetura" aria-labelledby="arquitetura-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Mapa de arquitetura</p>
+          <h2 id="arquitetura-title">Como as peças conversam</h2>
+          <p>O widget conversa com a API; a API consulta PostgreSQL, aplica ranking v0 ou usa fallback.</p>
+        </div>
+
+        <div class="architecture-map reveal" role="img" aria-label="Diagrama visual da arquitetura do Kouzina Reco">
+          <div class="arch-node site">Site/Produto Kouzina</div>
+          <div class="arch-arrow" aria-hidden="true">→</div>
+          <div class="arch-node widget">widget/kouzina-reco.js</div>
+          <div class="arch-split">
+            <div class="arch-line">
+              <span>GET /recommendations</span>
+              <span class="line-arrow" aria-hidden="true">→</span>
+              <span>FastAPI backend</span>
+            </div>
+            <div class="arch-line">
+              <span>POST /events</span>
+              <span class="line-arrow" aria-hidden="true">→</span>
+              <span>FastAPI backend</span>
+            </div>
+          </div>
+          <div class="arch-stack">
+            <div class="arch-node engine">ranking v0</div>
+            <div class="arch-node fallback">fallback mockado</div>
+          </div>
+          <div class="arch-arrow down" aria-hidden="true">↓</div>
+          <div class="db-cluster">
+            <div class="arch-node db">PostgreSQL</div>
+            <div class="db-tables">
+              <span>products</span>
+              <span>recommendation_events</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block" id="fluxo-widget" aria-labelledby="fluxo-widget-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Fluxo do widget</p>
+          <h2 id="fluxo-widget-title">Da página ao clique medido</h2>
+          <p>Este é o caminho operacional do `widget/kouzina-reco.js` no demo local.</p>
+        </div>
+        <ol class="flow-steps">
+          <li class="reveal"><span>01</span><strong>detecta `product_id`</strong><p>Lê container, meta tag ou texto com código do produto.</p></li>
+          <li class="reveal"><span>02</span><strong>cria `anonymous_id`</strong><p>Usa `localStorage` com fallback em memória se o navegador bloquear.</p></li>
+          <li class="reveal"><span>03</span><strong>cria `session_id`</strong><p>Usa `sessionStorage` para separar sessões sem identificar pessoa.</p></li>
+          <li class="reveal"><span>04</span><strong>envia `page_view`</strong><p>Registra carregamento do widget e contexto da página.</p></li>
+          <li class="reveal"><span>05</span><strong>busca recomendações</strong><p>Chama `GET /recommendations` com produto e widget.</p></li>
+          <li class="reveal"><span>06</span><strong>renderiza cards</strong><p>Mostra nome, preço quando existe, imagem quando existe e razão textual.</p></li>
+          <li class="reveal"><span>07</span><strong>envia impressão</strong><p>Registra `recommendation_impression` com quantidade e IDs recomendados.</p></li>
+          <li class="reveal"><span>08</span><strong>envia clique</strong><p>Registra `recommendation_click` com o produto recomendado clicado.</p></li>
+        </ol>
+      </section>
+
+      <section class="section-block" id="api" aria-labelledby="api-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Endpoints</p>
+          <h2 id="api-title">Contrato público atual da API</h2>
+          <p>Três endpoints sustentam o MVP: saúde do serviço, recomendações e eventos anônimos.</p>
+        </div>
+        <div class="endpoint-grid">
+          <article class="endpoint-card reveal">
+            <span class="badge real">real com banco</span>
+            <h3>GET /health</h3>
+            <p>Confirma que a API FastAPI está respondendo.</p>
+            <dl>
+              <dt>Entrada</dt>
+              <dd>Sem payload.</dd>
+              <dt>Resposta</dt>
+              <dd><code>{"status":"ok","service":"kouzina-reco-api","version":"0.1.0"}</code></dd>
+            </dl>
+          </article>
+          <article class="endpoint-card reveal">
+            <span class="badge catalog">dependente do catálogo</span>
+            <h3>GET /recommendations</h3>
+            <p>Busca produto no catálogo e aplica ranking v0; se não houver base suficiente, usa fallback.</p>
+            <dl>
+              <dt>Query</dt>
+              <dd><code>product_id=119&amp;widget_id=product-page</code></dd>
+              <dt>Resposta</dt>
+              <dd><code>{"widget_title":"Complete seu projeto","recommendations":[...]}</code></dd>
+            </dl>
+          </article>
+          <article class="endpoint-card reveal">
+            <span class="badge real">real com banco</span>
+            <h3>POST /events</h3>
+            <p>Valida eventos do widget e persiste em `recommendation_events` quando o banco está disponível.</p>
+            <dl>
+              <dt>Payload</dt>
+              <dd><code>{"event_type":"recommendation_click","anonymous_id":"frontend_visual_anon"}</code></dd>
+              <dt>Resposta</dt>
+              <dd><code>{"received":true,"event_type":"recommendation_click","timestamp":"..."}</code></dd>
+            </dl>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block tester-section" id="testador" aria-labelledby="testador-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Testador visual</p>
+          <h2 id="testador-title">Teste a API local sem sair do mapa</h2>
+          <p>Se a API estiver desligada ou bloqueada por CORS, a página continua funcionando e mostra a falha.</p>
+        </div>
+
+        <div class="tester-grid reveal">
+          <form class="tester-form" id="api-tester" aria-describedby="tester-help">
+            <p id="tester-help" class="form-help">Use apenas dados técnicos fictícios nos testes.</p>
+            <label>
+              API base URL
+              <input id="apiBaseUrl" name="apiBaseUrl" type="url" value="http://localhost:8000" required>
+            </label>
+            <div class="field-pair">
+              <label>
+                product_id
+                <input id="productId" name="productId" type="text" value="119">
+              </label>
+              <label>
+                widget_id
+                <input id="widgetId" name="widgetId" type="text" value="product-page">
+              </label>
+            </div>
+            <div class="tester-actions">
+              <button type="button" class="button primary" data-action="health">Testar health</button>
+              <button type="button" class="button secondary" data-action="recommendations">Buscar recomendações</button>
+              <button type="button" class="button tertiary" data-action="event">Enviar evento de teste</button>
+            </div>
+          </form>
+
+          <aside class="json-panel" aria-label="Resposta da API">
+            <div class="json-toolbar">
+              <span id="apiStatus" class="status-pill" aria-live="polite">Aguardando teste</span>
+              <button type="button" class="ghost-button" id="clearOutput">Limpar</button>
+            </div>
+            <pre id="apiOutput" tabindex="0">Clique em um botão para ver a resposta JSON.</pre>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section-block" id="ranking" aria-labelledby="ranking-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Ranking v0</p>
+          <h2 id="ranking-title">Pontuação por regras comerciais</h2>
+          <p>O frontend não calcula ranking real; ele explica visualmente como candidatos ganham ou perdem pontos.</p>
+        </div>
+        <div class="score-grid reveal" aria-label="Critérios de pontuação do ranking v0">
+          <div class="score-row positive" style="--score-width: 100%"><span>Complementaridade de tipo</span><strong>+30</strong></div>
+          <div class="score-row positive" style="--score-width: 66%"><span>Disponibilidade</span><strong>+20</strong></div>
+          <div class="score-row positive" style="--score-width: 50%"><span>Mesma voltagem</span><strong>+15</strong></div>
+          <div class="score-row positive" style="--score-width: 50%"><span>Faixa de preço próxima</span><strong>+15</strong></div>
+          <div class="score-row positive" style="--score-width: 34%"><span>Mesma marca</span><strong>+10</strong></div>
+          <div class="score-row positive" style="--score-width: 34%"><span>Mesmo ambiente</span><strong>+10</strong></div>
+          <div class="score-row positive" style="--score-width: 34%"><span>Nível premium semelhante</span><strong>+10</strong></div>
+          <div class="score-row negative" style="--score-width: 100%"><span>Exclusão do próprio produto</span><strong>-100</strong></div>
+          <div class="score-row negative" style="--score-width: 30%"><span>Penalização de indisponível</span><strong>-30</strong></div>
+        </div>
+      </section>
+
+      <section class="section-block" id="modelo" aria-labelledby="modelo-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Modelo de dados</p>
+          <h2 id="modelo-title">Tabelas que sustentam o MVP</h2>
+          <p>O modelo permanece simples: loja, produtos, relações manuais futuras e eventos do widget.</p>
+        </div>
+        <div class="data-grid">
+          <article class="data-card reveal">
+            <h3>stores</h3>
+            <p>Loja padrão `kouzina` e chave pública do widget.</p>
+            <ul><li>slug</li><li>name</li><li>domain</li><li>public_key</li><li>created_at</li></ul>
+          </article>
+          <article class="data-card reveal">
+            <h3>products</h3>
+            <p>Produtos seedados ou importados do catálogo oficial autorizado.</p>
+            <ul><li>external_id</li><li>name</li><li>url</li><li>image_url</li><li>brand</li><li>price</li><li>product_type</li><li>environment</li></ul>
+          </article>
+          <article class="data-card reveal">
+            <h3>manual_product_relations</h3>
+            <p>Estrutura pronta para curadoria editorial futura, ainda fora do ranking ativo.</p>
+            <ul><li>source_product_id</li><li>target_product_id</li><li>relation_type</li><li>weight</li><li>reason</li></ul>
+          </article>
+          <article class="data-card privacy-data reveal">
+            <h3>recommendation_events</h3>
+            <p>Eventos anônimos para medição do widget, sem dados pessoais.</p>
+            <ul><li>event_type</li><li>anonymous_id</li><li>session_id</li><li>page_url</li><li>product_external_id</li><li>recommended_product_external_id</li></ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block lgpd-section" id="lgpd" aria-labelledby="lgpd-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Privacidade e LGPD</p>
+          <h2 id="lgpd-title">Minimização de dados desde o MVP</h2>
+          <p>O projeto mede comportamento do widget sem identificar a pessoa visitante.</p>
+        </div>
+        <div class="privacy-columns">
+          <article class="privacy-card allowed reveal">
+            <h3>Permitido</h3>
+            <ul>
+              <li>`anonymous_id`</li>
+              <li>`session_id`</li>
+              <li>`event_type`</li>
+              <li>`page_url`</li>
+              <li>`product_id`</li>
+              <li>`widget_id`</li>
+              <li>`recommended_product_id`</li>
+              <li>`metadata` técnico não sensível</li>
+            </ul>
+          </article>
+          <article class="privacy-card blocked reveal">
+            <h3>Proibido</h3>
+            <ul>
+              <li>nome</li>
+              <li>CPF</li>
+              <li>e-mail</li>
+              <li>telefone</li>
+              <li>endereço</li>
+              <li>pagamento</li>
+              <li>conteúdo de formulário</li>
+              <li>mensagens de WhatsApp</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="catalogo" aria-labelledby="catalogo-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Catálogo e importação</p>
+          <h2 id="catalogo-title">Como os produtos chegam ao ranking</h2>
+          <p>A importação é local, autorizada e idempotente por `external_id`.</p>
+        </div>
+        <div class="catalog-grid">
+          <article class="catalog-card reveal">
+            <span class="badge local">local</span>
+            <h3>data/products_seed.csv</h3>
+            <p>Catálogo fictício ou semi-realista para desenvolvimento e validação sem depender do site real.</p>
+          </article>
+          <article class="catalog-card reveal">
+            <span class="badge blocked">ignorado pelo Git</span>
+            <h3>data/products_kouzina_official.csv</h3>
+            <p>Snapshot oficial autorizado, local, com importação por CSV UTF-8 com BOM e separador `;`.</p>
+          </article>
+          <article class="catalog-card reveal">
+            <span class="badge done">regra ativa</span>
+            <h3>Seed idempotente</h3>
+            <p>O importador cria ou atualiza produtos por `external_id`, evitando duplicidade.</p>
+          </article>
+          <article class="catalog-card reveal">
+            <span class="badge catalog">catálogo</span>
+            <h3>Preço e imagens</h3>
+            <p>`0.00` vira “Sob consulta”; imagens são URLs salvas no banco, não binários.</p>
+          </article>
+          <article class="catalog-card reveal">
+            <span class="badge local">demo</span>
+            <h3>Produto 119</h3>
+            <p>O demo local usa `product_id=119` quando o catálogo oficial autorizado está importado.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block review-section" id="revisao" aria-labelledby="revisao-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Revisão qualitativa</p>
+          <h2 id="revisao-title">Validação comercial antes de métricas avançadas</h2>
+          <p>
+            O arquivo `reports/recommendation_review.csv` reúne produtos de origem,
+            recomendações, score, razão textual e campos para avaliação manual da Kouzina.
+          </p>
+        </div>
+        <div class="review-card reveal">
+          <div>
+            <span class="badge real">geração local</span>
+            <h3>reports/recommendation_review.csv</h3>
+            <p>
+              Serve para revisar se as recomendações fazem sentido comercial antes de
+              CTR, fuzzy, ontologia ou ajustes automáticos.
+            </p>
+          </div>
+          <div class="csv-sheet" aria-hidden="true">
+            <span>current_product</span>
+            <span>recommended_product</span>
+            <span>score</span>
+            <span>reason</span>
+            <span>reviewer_rating</span>
+            <span>reviewer_comment</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block command-section" id="comandos" aria-labelledby="comandos-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Comandos úteis</p>
+          <h2 id="comandos-title">Rotina local do MVP</h2>
+        </div>
+        <div class="command-grid reveal">
+          <code>docker compose up -d</code>
+          <code>cd backend</code>
+          <code>python -m venv .venv</code>
+          <code>.\.venv\Scripts\Activate.ps1</code>
+          <code>pip install -r requirements.txt</code>
+          <code>uvicorn app.main:app --reload</code>
+          <code>python -m app.seed</code>
+          <code>python -m app.seed --file ../data/products_kouzina_official.csv --replace-products</code>
+          <code>cd widget</code>
+          <code>python -m http.server 5500</code>
+          <code>cd frontend</code>
+          <code>python -m http.server 5600</code>
+          <code>pytest</code>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Kouzina Reco — visualização local do MVP. Sem login, sem painel comercial, sem dados pessoais.</p>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     allowed_origins: str = (
         "http://localhost:3000,"
         "http://localhost:5500,"
+        "http://localhost:5600,"
         "http://localhost:8000,"
         "https://www.kouzinaclub.com.br,"
         "https://kouzinaclub.com.br"
