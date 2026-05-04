@@ -17,3 +17,4 @@ data/products_kouzina_official.xlsx
 data/raw/
 reports/*.csv
 reports/*.xlsx
+reports/*.html

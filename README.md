@@ -2,7 +2,7 @@
 
 MVP comercial minimo de recomendacao para o site Kouzina Club.
 
-Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.5 e 4.6:
+Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.5, 4.6 e 4.7:
 
 - API FastAPI minima.
 - `GET /health`.
@@ -17,6 +17,7 @@ Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.
 - Suporte a URL Tray e imagem principal/adicional do catalogo oficial autorizado.
 - Relacoes complementares comerciais iniciais para tipos reais do catalogo oficial.
 - Relatorio CSV para revisao qualitativa das recomendacoes.
+- Pacote HTML estatico para revisao visual das recomendacoes pela Kouzina.
 
 Fora de escopo: fuzzy, ontologia, integracao Tray, painel, login, deploy,
 ranking sofisticado, crawler, scraping e multi-loja completo.
@@ -29,8 +30,10 @@ backend/
     __init__.py
     main.py
     database.py
+    export_review_pack.py
     models.py
     recommender.py
+    review_recommendations.py
     schemas.py
     seed.py
     settings.py
@@ -317,12 +320,46 @@ python -m app.review_recommendations --product-type Churrasqueira --top-k 4
 
 Detalhes: `docs/RECOMMENDATION_REVIEW.md`.
 
+## Pacote visual de revisao qualitativa
+
+A Fase 4.7 transforma `reports/recommendation_review.csv` em um HTML local para
+facilitar a reuniao com a Kouzina. O HTML e apenas visual: ele nao salva
+avaliacoes, nao altera banco, nao altera ranking e nao chama API externa.
+
+Depois de gerar o CSV:
+
+```powershell
+cd backend
+python -m app.export_review_pack
+```
+
+Arquivo gerado:
+
+```text
+reports/recommendation_review.html
+```
+
+Abra esse arquivo no navegador. Use o HTML para discutir cada recomendacao e
+registre o preenchimento oficial em `reviewer_rating` e `reviewer_comment` no
+CSV ou em uma planilha copiada.
+
+Filtros uteis:
+
+```powershell
+python -m app.export_review_pack --limit 120
+python -m app.export_review_pack --min-score 70
+python -m app.export_review_pack --product-type Churrasqueira
+```
+
+Esta etapa continua antes de CTR, fuzzy, ontologia e deploy.
+
 ## Proxima fase
 
-A proxima fase recomendada e preencher o relatorio de revisao qualitativa com a
-Kouzina e usar os comentarios para ajustar curadoria editorial. Depois disso,
-medir impressoes, cliques e CTR. Fuzzy, ontologia, Tray, painel, login e deploy
-continuam fora ate autorizacao explicita em fases posteriores.
+A proxima fase recomendada e usar o pacote HTML em uma reuniao com a Kouzina,
+preencher o CSV ou planilha de revisao e usar os comentarios para ajustar
+curadoria editorial. Depois disso, medir impressoes, cliques e CTR. Fuzzy,
+ontologia, Tray, painel, login e deploy continuam fora ate autorizacao
+explicita em fases posteriores.
 
 ## Rodar testes
 

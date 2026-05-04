@@ -24,6 +24,7 @@ Fases concluidas e validadas:
 - Fase 4.4: suporte completo a URL Tray e imagens do CSV oficial atualizado.
 - Fase 4.5: ampliacao das relacoes complementares comerciais.
 - Fase 4.6: relatorio CSV para revisao qualitativa das recomendacoes.
+- Fase 4.7: pacote HTML estatico para revisao visual das recomendacoes.
 
 Fora de escopo ate autorizacao explicita:
 
@@ -72,6 +73,7 @@ backend/
   app/
     __init__.py
     database.py
+    export_review_pack.py
     main.py
     models.py
     recommender.py
@@ -100,6 +102,7 @@ docs/
 reports/
   .gitkeep
   recommendation_review.csv
+  recommendation_review.html
   recommendation_review_churrasqueira.csv
 widget/
   demo.html
@@ -116,7 +119,7 @@ handoff.md
 Observacoes de workspace:
 
 - `data/products_kouzina_official.csv` existe localmente e e ignorado pelo Git.
-- `reports/*.csv` e `reports/*.xlsx` sao ignorados pelo Git.
+- `reports/*.csv`, `reports/*.xlsx` e `reports/*.html` sao ignorados pelo Git.
 - `reports/.gitkeep` foi criado para manter a pasta no repositorio.
 - `.env` existe localmente e e ignorado.
 - `README.md` referencia `.env.example`, mas nesta inspecao o arquivo
@@ -147,7 +150,8 @@ Componentes:
 - Banco local: Docker Compose com PostgreSQL.
 - Seed: CSV ficticio e CSV oficial autorizado local.
 - Testes: pytest com SQLite temporario para testes unitarios/de API.
-- Relatorio: CSV gerado em `reports/recommendation_review.csv`.
+- Relatorio: CSV gerado em `reports/recommendation_review.csv` e HTML visual
+  gerado em `reports/recommendation_review.html`.
 
 ## Contratos Da API
 
@@ -622,6 +626,63 @@ Objetivo do relatorio:
 - avaliar se produtos sob consulta devem aparecer em certos contextos;
 - avaliar se a explicacao esta clara.
 
+## Pacote HTML De Revisao Qualitativa
+
+Fase 4.7 criou:
+
+```text
+backend/app/export_review_pack.py
+backend/tests/test_review_pack.py
+```
+
+Comando padrao:
+
+```powershell
+cd backend
+python -m app.export_review_pack
+```
+
+Entrada padrao:
+
+```text
+reports/recommendation_review.csv
+```
+
+Saida padrao:
+
+```text
+reports/recommendation_review.html
+```
+
+Parametros:
+
+```text
+--input
+--output
+--limit
+--min-score
+--product-type
+```
+
+Objetivo do HTML:
+
+- facilitar a reuniao de revisao com a Kouzina;
+- mostrar origem, recomendado, imagem, score e reason em cards;
+- mostrar escala de rating de 1 a 5;
+- manter campos visuais para `reviewer_rating` e `reviewer_comment`;
+- apoiar discussao comercial sem virar painel.
+
+Limitacoes:
+
+- o HTML e estatico e apenas visual;
+- o preenchimento oficial continua no CSV ou em planilha copiada;
+- nao altera banco;
+- nao altera ranking;
+- nao calcula CTR;
+- nao chama API externa;
+- nao baixa imagens;
+- nao usa dados pessoais.
+
 ## Validacoes Registradas
 
 Ultima validacao consolidada informada no projeto:
@@ -786,6 +847,12 @@ cd ..\backend
 .\.venv\Scripts\python.exe -m app.review_recommendations
 ```
 
+Gerar pacote HTML de revisao:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.export_review_pack
+```
+
 ## Arquivos Criados Ou Alterados Por Fase
 
 ### Fase 1
@@ -881,6 +948,15 @@ cd ..\backend
 - `docs/RECOMMENDATION_REVIEW.md`
 - `reports/.gitkeep`
 
+### Fase 4.7
+
+- `.gitignore`
+- `README.md`
+- `backend/app/export_review_pack.py`
+- `backend/tests/test_review_pack.py`
+- `docs/RECOMMENDATION_REVIEW.md`
+- `handoff.md`
+
 ## Decisoes Importantes
 
 - `products_seed.csv` permanece como seed ficticio de desenvolvimento.
@@ -911,7 +987,8 @@ cd ..\backend
 - Nao ha integracao Tray automatica.
 - Nao ha painel para visualizar eventos.
 - Nao ha calculo automatico de CTR ainda.
-- Relatorios em `reports/*.csv` sao gerados localmente e ignorados pelo Git.
+- Relatorios em `reports/*.csv` e `reports/*.html` sao gerados localmente e
+  ignorados pelo Git.
 - O arquivo oficial `data/products_kouzina_official.csv` e local; outro
   ambiente precisa receber esse arquivo manualmente.
 - Alguns documentos exibem acentos quebrados dependendo do encoding do
@@ -925,10 +1002,11 @@ Nao avancar direto para fuzzy, ontologia ou deploy.
 Proximo passo pratico:
 
 1. Gerar `reports/recommendation_review.csv` com o catalogo oficial atual.
-2. Enviar o CSV para revisao da Kouzina.
-3. Preencher `reviewer_rating` e `reviewer_comment`.
-4. Consolidar comentarios em ajustes editoriais.
-5. Decidir se a proxima fase sera:
+2. Gerar `reports/recommendation_review.html`.
+3. Usar o HTML na reuniao de revisao com a Kouzina.
+4. Preencher `reviewer_rating` e `reviewer_comment` no CSV ou planilha copiada.
+5. Consolidar comentarios em ajustes editoriais.
+6. Decidir se a proxima fase sera:
    - ajustes nas relacoes complementares;
    - uso de `manual_product_relations`;
    - criacao de relatorio de eventos/CTR;
