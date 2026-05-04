@@ -12,6 +12,25 @@ tambem gera um HTML estatico local para facilitar a reuniao de revisao.
 Esta etapa nao usa dados pessoais, pedidos, checkout, pagamentos ou mensagens.
 Ela opera somente sobre o catalogo importado e os atributos dos produtos.
 
+## Fase 4.8 - Validacao Com A Kouzina
+
+O objetivo da Fase 4.8 e usar o CSV e o HTML de revisao para gerar rotulos de
+especialista sobre o recomendador v0. A reuniao valida plausibilidade comercial,
+separa relacoes fortes de relacoes fracas e ajuda a definir politica para itens
+`Sob consulta`.
+
+Esta fase nao substitui validacao academica, nao mede CTR, nao implementa
+fuzzy, nao implementa ontologia e nao altera o comportamento do sistema. Ela
+prepara insumos para fases futuras.
+
+Saidas esperadas:
+
+- `reviewer_rating` preenchido para uma amostra pequena e representativa;
+- `reviewer_comment` com justificativas comerciais e excecoes;
+- lista de relacoes universais, contextuais, especificas e proibidas;
+- politica inicial para produtos `Sob consulta`;
+- pontos de ajuste para curadoria editorial futura.
+
 ## Como Gerar O Relatorio
 
 Com o PostgreSQL rodando e o catalogo oficial importado:
@@ -83,6 +102,29 @@ e escapa o conteudo textual antes de renderizar.
 O HTML e apenas visual. Ele nao salva `reviewer_rating` nem
 `reviewer_comment`.
 
+Para a Fase 4.8, nao revise 120 cards em sequencia. Use uma amostra de **24 a
+40 recomendacoes**, preferencialmente estratificada em quatro blocos:
+
+- **Casos fortes:** pares provavelmente corretos, como complementos funcionais
+  claros.
+- **Casos medios:** recomendacoes aceitaveis, mas com ordem, motivo ou contexto
+  discutivel.
+- **Produtos sob consulta:** itens sem preco que podem ou nao fazer sentido no
+  carousel.
+- **Casos controversos:** pares suspeitos, cruzamento entre dominios ou
+  recomendacoes puxadas apenas por ambiente, marca ou faixa premium.
+
+Sugestao de roteiro:
+
+| Bloco | Tempo | Objetivo |
+| --- | ---: | --- |
+| Alinhamento | 5 min | Reforcar que o v0 nao e fuzzy/ontologia e que a reuniao gera rotulos de especialista. |
+| Casos fortes | 10 min | Confirmar relacoes que podem virar base semantica futura. |
+| Casos medios | 10 min | Identificar ajustes de ordem, reason e contexto. |
+| Sob consulta | 10 min | Definir quando itens sem preco podem aparecer. |
+| Controversos | 10 a 15 min | Vetar ou restringir relacoes fracas. |
+| Fechamento | 5 a 10 min | Consolidar decisoes e proximos ajustes editoriais. |
+
 ## Como Preencher
 
 O CSV inclui duas colunas para revisao manual:
@@ -101,6 +143,15 @@ Escala sugerida para `reviewer_rating`:
 Use `reviewer_comment` para registrar o motivo da avaliacao, ajustes desejados
 ou produtos que deveriam aparecer antes.
 
+Na Fase 4.8, use `reviewer_comment` para registrar tambem:
+
+- se a relacao e universal, contextual ou especifica da Kouzina;
+- se a relacao e complemento, alternativa, mesma suite ou editorial;
+- se depende de medida, instalacao, marcenaria, voltagem, largura ou outro
+  requisito tecnico;
+- se o produto sob consulta deve aparecer nesse contexto;
+- se a explicacao deveria ser mais concreta.
+
 ## Perguntas Sugeridas
 
 - Esse produto realmente complementa o produto atual?
@@ -108,6 +159,12 @@ ou produtos que deveriam aparecer antes.
 - Ha algum produto que deveria aparecer antes?
 - Produto sob consulta deve ser mostrado nesse contexto?
 - A explicacao esta clara?
+- Esta relacao e universal, contextual ou especifica da loja-piloto?
+- A relacao e complemento, alternativa, mesma suite ou merchandising editorial?
+- O item depende de medida, instalacao, marcenaria, abertura, largura ou
+  voltagem?
+- O item deveria aparecer somente quando houver projeto ou consultoria?
+- O item e high-end coerente ou apenas high-ticket proximo?
 
 ## Colunas Do CSV
 

@@ -2,7 +2,7 @@
 
 MVP comercial minimo de recomendacao para o site Kouzina Club.
 
-Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.5, 4.6 e 4.7:
+Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.5, 4.6 e 4.7, com preparacao documental para a Fase 4.8:
 
 - API FastAPI minima.
 - `GET /health`.
@@ -18,6 +18,7 @@ Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.
 - Relacoes complementares comerciais iniciais para tipos reais do catalogo oficial.
 - Relatorio CSV para revisao qualitativa das recomendacoes.
 - Pacote HTML estatico para revisao visual das recomendacoes pela Kouzina.
+- Politica documental inicial para orientar validacao qualitativa com a Kouzina.
 
 Fora de escopo: fuzzy, ontologia, integracao Tray, painel, login, deploy,
 ranking sofisticado, crawler, scraping e multi-loja completo.
@@ -357,9 +358,15 @@ Esta etapa continua antes de CTR, fuzzy, ontologia e deploy.
 
 A proxima fase recomendada e usar o pacote HTML em uma reuniao com a Kouzina,
 preencher o CSV ou planilha de revisao e usar os comentarios para ajustar
-curadoria editorial. Depois disso, medir impressoes, cliques e CTR. Fuzzy,
-ontologia, Tray, painel, login e deploy continuam fora ate autorizacao
-explicita em fases posteriores.
+curadoria editorial. A sequencia academica posterior planejada e dataset
+publico/baseline, ontologia minima, motor fuzzy e comparacao por metricas.
+Fuzzy, ontologia, Tray, painel, login, deploy e CTR continuam fora ate
+autorizacao explicita em fases posteriores.
+
+Detalhes da Fase 4.8:
+
+- `docs/PHASE_4_8_VALIDACAO_KOUZINA.md`
+- `docs/RELATION_POLICY.md`
 
 ## Rodar testes
 

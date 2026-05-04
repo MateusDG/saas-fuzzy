@@ -56,6 +56,8 @@ Antes de alterar qualquer arquivo, ler nesta ordem:
 8. `docs/RECOMMENDER.md`
 9. `docs/CATALOG_QUALITY.md`
 10. `docs/RECOMMENDATION_REVIEW.md`
+11. `docs/PHASE_4_8_VALIDACAO_KOUZINA.md`
+12. `docs/RELATION_POLICY.md`
 
 `CLAUDE.md` deve ser tratado apenas como historico de Claude Code, nao como
 fonte principal para Codex.
@@ -94,6 +96,8 @@ docs/
   COMECAR.md
   DATA_MODEL.md
   EVENTS.md
+  PHASE_4_8_VALIDACAO_KOUZINA.md
+  RELATION_POLICY.md
   MVP.md
   RECOMMENDATION_REVIEW.md
   RECOMMENDER.md
@@ -1014,6 +1018,49 @@ Proximo passo pratico:
 
 Somente depois dessa revisao qualitativa faz sentido planejar metricas/CTR.
 Fuzzy e ontologia continuam como fase academica posterior.
+
+## Proximo passo: Fase 4.8 - Validacao qualitativa com Kouzina
+
+A Fase 4.8 deve transformar o Review Pack em uma reuniao objetiva com a
+Kouzina. Essa reuniao e necessaria porque o recomendador v0 ainda mistura
+relacoes universalmente defensaveis com relacoes contextuais, editoriais ou
+fracas. Antes de formalizar qualquer ontologia ou motor fuzzy, e preciso saber
+quais pares realmente fazem sentido para especialistas do dominio.
+
+Papel da reuniao:
+
+- validar plausibilidade comercial das recomendacoes atuais;
+- produzir rotulos de especialista em `reviewer_rating` e
+  `reviewer_comment`;
+- separar relacoes universais, contextuais, especificas da Kouzina e
+  proibidas;
+- definir politica inicial para produtos `Sob consulta`;
+- identificar relacoes que devem ser mantidas, restringidas ou removidas em
+  fases futuras.
+
+A reuniao nao substitui validacao academica. Ela nao prova generalizacao, nao
+mede CTR, nao compara algoritmos e nao implementa fuzzy ou ontologia. Ela serve
+como etapa de rotulagem especializada para melhorar o baseline e preparar as
+fases academicas seguintes.
+
+Roteiro recomendado:
+
+1. Gerar `reports/recommendation_review.csv`.
+2. Gerar `reports/recommendation_review.html`.
+3. Selecionar amostra de 24 a 40 recomendacoes.
+4. Revisar casos fortes, casos medios, produtos sob consulta e casos
+   controversos.
+5. Preencher rating e comentarios no CSV ou planilha copiada.
+6. Consolidar decisoes em `docs/RELATION_POLICY.md`.
+
+Sequencia academica prevista depois da Fase 4.8:
+
+- Fase 5: dataset publico e baseline academico reproduzivel.
+- Fase 6: ontologia minima.
+- Fase 7: motor fuzzy.
+- Fase 8: comparacao e metricas.
+
+Nao inverter essa ordem sem autorizacao explicita.
 
 ## Instrucao Para Outro CLI Codex
 
