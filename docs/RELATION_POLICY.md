@@ -1,12 +1,27 @@
 # Politica De Relacoes Do Recomendador
 
-Este documento resume a politica pratica de relacoes para orientar a Fase 4.8
-sem alterar o comportamento atual do sistema. Ele transforma a pesquisa de
-`docs/PHASE_4_8_VALIDACAO_KOUZINA.md` em criterios de revisao comercial.
+Este documento resume a politica pratica de relacoes para orientar a Fase 4.9.
+As regras daqui sao hipoteses provisorias derivadas da reuniao simulada de
+agentes da Fase 4.8 e nao representam validacao humana final da Kouzina.
 
-Esta politica nao implementa fuzzy, ontologia, CTR, painel, deploy ou mudanca
-no ranking v0. Ela serve para conduzir a reuniao com a Kouzina e preparar
-ajustes futuros.
+Esta politica nao implementa fuzzy, ontologia, CTR, painel ou deploy. Nesta
+fase, ela aplica guardrails editoriais simples no ranking v0 para reduzir falso
+positivo e melhorar explicabilidade.
+
+## Status De Validacao
+
+- `derivado da revisao dos agentes`;
+- `hipotese provisoria`;
+- `nao validado por cliente ainda`;
+- `pendente de validacao por comportamento real`.
+
+A validacao real sera futura, somente apos integracao de API/widget ao site e
+coleta de eventos reais suficientes.
+
+Artefatos versionados da politica provisoria:
+
+- `data/relation_policy_seed.csv` (fonte de politica);
+- `backend/app/relation_policy.py` (loader e fallback seguro).
 
 ## Objetivo
 
@@ -129,8 +144,8 @@ ou reduz confianca na recomendacao?
 
 ## Criterios Atuais Do v0
 
-Esta tabela nao muda o codigo. Ela orienta o que revisar na Fase 4.8 e o que
-pode virar trabalho futuro.
+Esta tabela orienta os guardrails da Fase 4.9 e o que pode virar trabalho
+futuro.
 
 | Criterio atual | Decisao de politica | Observacao |
 | --- | --- | --- |
@@ -145,7 +160,7 @@ pode virar trabalho futuro.
 | Penalizacao de indisponivel | Manter e refinar futuramente | Diferenciar indisponivel, descontinuado e sob consulta. |
 | Reason textual | Manter e enriquecer futuramente | Deve ficar mais concreta: instalacao, voltagem, linha, medida e contexto. |
 
-## Como Usar Na Reuniao
+## Como Usar Na Curadoria Interna
 
 Para cada recomendacao revisada, registrar no comentario:
 

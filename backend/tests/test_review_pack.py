@@ -35,6 +35,20 @@ def valid_review_row(**overrides: str) -> dict[str, str]:
         "source_url": "https://www.kouzinaclub.com.br/source",
         "recommended_url": "https://www.kouzinaclub.com.br/recommended",
         "recommended_image_url": "https://cdn.example.com/adega.jpg",
+        "relation_class": "contextual",
+        "relation_type": "complement",
+        "relation_policy_action": "allow",
+        "validation_status": "pending_client_data",
+        "requires_project_context": "true",
+        "requires_installation_check": "true",
+        "quote_policy": "allow_top3_with_context",
+        "quote_reason": "",
+        "is_quote_only": "false",
+        "is_policy_demoted": "false",
+        "is_policy_blocked": "false",
+        "policy_notes": "Hipotese provisoria.",
+        "reason_quality": "medium",
+        "labels": "contextual,complement,requires_project_context",
         "reviewer_rating": "",
         "reviewer_comment": "",
     }
@@ -60,6 +74,40 @@ def test_review_pack_generates_html_with_title_summary_and_rating_scale(tmp_path
     assert "4 = boa" in html
     assert "5 = excelente" in html
     assert "Esse produto realmente complementa o produto atual?" in html
+    assert "relation_class" in html
+    assert "policy_action" in html
+    assert "reason_quality" in html
+    assert "labels:" in html
+
+
+def test_review_pack_renders_policy_and_quote_fields(tmp_path: Path) -> None:
+    input_path = tmp_path / "recommendation_review.csv"
+    output_path = tmp_path / "recommendation_review.html"
+    write_review_csv(
+        input_path,
+        [
+            valid_review_row(
+                relation_class="universal",
+                relation_type="complement",
+                relation_policy_action="boost",
+                validation_status="agent_hypothesis",
+                quote_policy="allow_if_strong",
+                is_quote_only="true",
+                quote_reason="Produto sob consulta permitido quando a relacao for forte.",
+                reason_quality="strong",
+                labels="universal,complement,quote_only",
+            )
+        ],
+    )
+
+    generate_review_pack(input_path=input_path, output_path=output_path)
+    html = output_path.read_text(encoding="utf-8")
+
+    assert "allow_if_strong" in html
+    assert "agent_hypothesis" in html
+    assert "Produto sob consulta permitido quando a relacao for forte." in html
+    assert "quote_only" in html
+    assert "policy_notes" in html
 
 
 def test_review_pack_escapes_html_in_names_and_comments(tmp_path: Path) -> None:

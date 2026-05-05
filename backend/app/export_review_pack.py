@@ -157,6 +157,50 @@ def image_html(row: dict[str, str]) -> str:
     return f"<img src=\"{image_url}\" alt=\"{name}\" loading=\"lazy\">"
 
 
+def render_policy_meta(row: dict[str, str]) -> str:
+    items = [
+        ("relation_class", row_value(row, "relation_class") or "na"),
+        ("relation_type", row_value(row, "relation_type") or "na"),
+        ("policy_action", row_value(row, "relation_policy_action") or "na"),
+        ("validation_status", row_value(row, "validation_status") or "na"),
+        ("quote_policy", row_value(row, "quote_policy") or "na"),
+        ("is_quote_only", row_value(row, "is_quote_only") or "false"),
+        ("is_policy_demoted", row_value(row, "is_policy_demoted") or "false"),
+        ("is_policy_blocked", row_value(row, "is_policy_blocked") or "false"),
+        ("reason_quality", row_value(row, "reason_quality") or "na"),
+    ]
+    labels = row_value(row, "labels")
+    notes = row_value(row, "policy_notes")
+    quote_reason = row_value(row, "quote_reason")
+
+    details = "".join(
+        f"<div><dt>{html_text(key)}</dt><dd>{html_text(value)}</dd></div>"
+        for key, value in items
+    )
+    labels_html = (
+        f"<p class=\"policy-inline\"><strong>labels:</strong> {html_text(labels)}</p>"
+        if labels
+        else "<p class=\"policy-inline\"><strong>labels:</strong> na</p>"
+    )
+    quote_reason_html = (
+        f"<p class=\"policy-inline\"><strong>quote_reason:</strong> {html_text(quote_reason)}</p>"
+        if quote_reason
+        else ""
+    )
+    notes_html = (
+        f"<p class=\"policy-inline\"><strong>policy_notes:</strong> {html_text(notes)}</p>"
+        if notes
+        else ""
+    )
+    return (
+        "<div class=\"policy-box\">"
+        "<span>Policy</span>"
+        f"<dl class=\"policy-grid\">{details}</dl>"
+        f"{labels_html}{quote_reason_html}{notes_html}"
+        "</div>"
+    )
+
+
 def render_product_meta(prefix: str, row: dict[str, str]) -> str:
     price = format_price(
         row_value(row, f"{prefix}_price"),
@@ -212,6 +256,7 @@ def render_review_card(row: dict[str, str], index: int) -> str:
             <span>Reason</span>
             <p>{html_text(row_value(row, "reason") or "Sem explicacao registrada.")}</p>
           </div>
+          {render_policy_meta(row)}
           <div class="review-fields" aria-label="Campos visuais de revisao">
             <div>
               <span>reviewer_rating</span>
@@ -557,6 +602,7 @@ def build_review_pack_html(
 
       .score-box,
       .reason-box,
+      .policy-box,
       .review-fields div {{
         border-radius: 18px;
         padding: 12px;
@@ -572,6 +618,7 @@ def build_review_pack_html(
 
       .score-box span,
       .reason-box span,
+      .policy-box span,
       .review-fields span {{
         color: var(--amber);
         font-size: 0.78rem;
@@ -582,6 +629,43 @@ def build_review_pack_html(
 
       .reason-box {{
         margin-top: 10px;
+      }}
+
+      .policy-box {{
+        margin-top: 10px;
+      }}
+
+      .policy-grid {{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin: 8px 0 0;
+      }}
+
+      .policy-grid div {{
+        border-radius: 10px;
+        padding: 7px 8px;
+        background: rgba(255, 244, 221, 0.08);
+      }}
+
+      .policy-grid dt {{
+        color: var(--amber);
+        font-size: 0.68rem;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }}
+
+      .policy-grid dd {{
+        margin: 3px 0 0;
+        color: var(--cream);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }}
+
+      .policy-inline {{
+        margin: 7px 0 0;
+        font-size: 0.82rem;
       }}
 
       .reason-box p,
@@ -648,11 +732,11 @@ def build_review_pack_html(
   <body>
     <main>
       <section class="hero">
-        <p class="eyebrow">Fase 4.7 | Review Pack local</p>
+        <p class="eyebrow">Fase 4.9 | Review Pack local</p>
         <h1>Kouzina Reco — Revisão Qualitativa</h1>
         <p class="lead">
-          Pacote visual gerado a partir de {html_text(display_path(input_path))}. Use este HTML para discutir recomendacoes com a Kouzina.
-          O preenchimento oficial continua no CSV ou em uma planilha copiada.
+          Pacote visual gerado a partir de {html_text(display_path(input_path))}. Use este HTML para revisao qualitativa interna.
+          Hipoteses de relacao nesta fase sao provisorias e o preenchimento oficial continua no CSV ou em uma planilha copiada.
         </p>
         <div class="summary-grid" aria-label="Resumo do pacote">
           <div class="summary-card"><span>Linhas exibidas</span><strong>{len(rows)}</strong></div>
@@ -691,7 +775,7 @@ def build_review_pack_html(
       </section>
 
       <section class="questions" aria-label="Perguntas sugeridas">
-        <h2>Perguntas para a Kouzina</h2>
+        <h2>Perguntas para validacao futura</h2>
         <ul>
           <li>Esse produto realmente complementa o produto atual?</li>
           <li>A recomendação faz sentido comercial?</li>

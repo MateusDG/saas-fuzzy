@@ -2,7 +2,7 @@
 
 MVP comercial minimo de recomendacao para o site Kouzina Club.
 
-Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.5, 4.6 e 4.7, com preparacao documental para a Fase 4.8:
+Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7 e 4.9:
 
 - API FastAPI minima.
 - `GET /health`.
@@ -18,10 +18,29 @@ Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.
 - Relacoes complementares comerciais iniciais para tipos reais do catalogo oficial.
 - Relatorio CSV para revisao qualitativa das recomendacoes.
 - Pacote HTML estatico para revisao visual das recomendacoes pela Kouzina.
-- Politica documental inicial para orientar validacao qualitativa com a Kouzina.
+- Politica provisoria de relacoes derivada da revisao dos agentes.
+- Guardrails editoriais no ranking v0 para reduzir falsos positivos.
+- Enriquecimento do review CSV/HTML com campos de politica provisoria.
+- Preparacao de telemetria para analise futura de funil com dados reais.
 
 Fora de escopo: fuzzy, ontologia, integracao Tray, painel, login, deploy,
 ranking sofisticado, crawler, scraping e multi-loja completo.
+
+## Fase 4.9
+
+A Fase 4.9 trata as conclusoes da Fase 4.8 como hipoteses especialistas
+provisorias. Nesta fase:
+
+- nao houve validacao humana final com Kouzina;
+- nao houve analise de comportamento real de clientes;
+- nao existem conclusoes de funil, CTR ou conversao reais;
+- o objetivo e preparar o baseline para coletar dados uteis no futuro.
+
+Documentos da fase:
+
+- `docs/PHASE_4_9_RELATION_POLICY_AND_TELEMETRY_PREP.md`
+- `docs/RELATION_HYPOTHESES_PHASE_4_9.md`
+- `docs/FUTURE_FUNNEL_ANALYTICS_PLAN.md`
 
 ## Estrutura
 
@@ -252,7 +271,7 @@ importado, a API usa fallback mockado para manter o demo funcional.
 
 ## Eventos permitidos
 
-Nesta fase, a API aceita somente:
+Eventos atuais de MVP:
 
 ```text
 page_view
@@ -261,8 +280,24 @@ recommendation_impression
 recommendation_click
 ```
 
-Os eventos sao validados, confirmados e salvos em `recommendation_events`
-quando o banco esta disponivel.
+Eventos preparados para funil futuro (sem analise nesta fase):
+
+```text
+widget_opened
+product_context_loaded
+recommendations_requested
+recommendations_rendered
+recommendation_expanded
+recommendation_dismissed
+quote_requested
+add_to_cart_clicked
+alternative_requested
+session_ended
+```
+
+Os eventos sao validados, confirmados e salvos em `recommendation_events`.
+A analise desses eventos continua pendente ate integracao real do widget/API ao
+site e volume suficiente de sessoes reais.
 
 ## Privacidade
 
@@ -284,7 +319,8 @@ conteudo de formularios.
 
 O recomendador v0 pontua candidatos por complementaridade de tipo, disponibilidade,
 mesma voltagem, preco proximo, mesma marca, mesmo ambiente e nivel premium
-semelhante. O proprio produto visualizado nunca deve ser retornado.
+semelhante, com guardrails editoriais provisorios da Fase 4.9. O proprio
+produto visualizado nunca deve ser retornado.
 
 Quando o preco de um produto oficial estiver nulo ou como `Sob consulta`, a
 regra de faixa de preco proxima nao pontua. Produtos sob consulta continuam
@@ -354,19 +390,25 @@ python -m app.export_review_pack --product-type Churrasqueira
 
 Esta etapa continua antes de CTR, fuzzy, ontologia e deploy.
 
-## Proxima fase
+## Proximas fases
 
-A proxima fase recomendada e usar o pacote HTML em uma reuniao com a Kouzina,
-preencher o CSV ou planilha de revisao e usar os comentarios para ajustar
-curadoria editorial. A sequencia academica posterior planejada e dataset
-publico/baseline, ontologia minima, motor fuzzy e comparacao por metricas.
-Fuzzy, ontologia, Tray, painel, login, deploy e CTR continuam fora ate
-autorizacao explicita em fases posteriores.
+Sem reuniao humana nesta etapa, a validacao real fica para quando houver
+integracao de widget/API ao site e eventos reais suficientes.
 
-Detalhes da Fase 4.8:
+Sequencia planejada:
 
-- `docs/PHASE_4_8_VALIDACAO_KOUZINA.md`
+1. consolidar telemetria real em producao controlada;
+2. analisar funil com dados reais anonimos;
+3. ajustar curadoria por comportamento observado;
+4. preparar fase academica de baseline reproducivel (Fase 5);
+5. evoluir para ontologia minima (Fase 6);
+6. evoluir para fuzzy (Fase 7).
+
+Detalhes:
+
 - `docs/RELATION_POLICY.md`
+- `docs/RECOMMENDATION_REVIEW.md`
+- `docs/FUTURE_FUNNEL_ANALYTICS_PLAN.md`
 
 ## Rodar testes
 

@@ -12,6 +12,18 @@ tambem gera um HTML estatico local para facilitar a reuniao de revisao.
 Esta etapa nao usa dados pessoais, pedidos, checkout, pagamentos ou mensagens.
 Ela opera somente sobre o catalogo importado e os atributos dos produtos.
 
+## Fase 4.9 - Uso Provisorio Das Hipoteses
+
+Nesta fase, as conclusoes da reuniao simulada de agentes (Fase 4.8) sao
+tratadas como hipoteses provisorias.
+
+- nao houve validacao humana final com a Kouzina nesta etapa;
+- nao houve analise de comportamento real de clientes;
+- nao ha conclusao definitiva de funil, CTR ou conversao.
+
+O objetivo atual e preparar o ranking v0, o review pack e os eventos para que a
+validacao real seja feita depois da integracao da API/widget ao site.
+
 ## Fase 4.8 - Validacao Com A Kouzina
 
 O objetivo da Fase 4.8 e usar o CSV e o HTML de revisao para gerar rotulos de
@@ -90,11 +102,11 @@ O HTML nao depende de servidor web, nao altera banco, nao altera ranking, nao
 chama API externa e nao baixa imagens. Ele usa somente URLs ja presentes no CSV
 e escapa o conteudo textual antes de renderizar.
 
-## Como Usar Na Reuniao
+## Como Usar Na Revisao Interna
 
 1. Gere `reports/recommendation_review.csv`.
 2. Gere `reports/recommendation_review.html`.
-3. Abra o HTML em um navegador durante a reuniao com a Kouzina.
+3. Abra o HTML em um navegador para revisao interna.
 4. Discuta cada card visualmente: produto de origem, recomendado, score e
    explicacao.
 5. Registre a avaliacao oficial no CSV ou em uma planilha copiada.
@@ -102,7 +114,7 @@ e escapa o conteudo textual antes de renderizar.
 O HTML e apenas visual. Ele nao salva `reviewer_rating` nem
 `reviewer_comment`.
 
-Para a Fase 4.8, nao revise 120 cards em sequencia. Use uma amostra de **24 a
+Para a Fase 4.9, nao revise 120 cards em sequencia. Use uma amostra de **24 a
 40 recomendacoes**, preferencialmente estratificada em quatro blocos:
 
 - **Casos fortes:** pares provavelmente corretos, como complementos funcionais
@@ -118,7 +130,7 @@ Sugestao de roteiro:
 
 | Bloco | Tempo | Objetivo |
 | --- | ---: | --- |
-| Alinhamento | 5 min | Reforcar que o v0 nao e fuzzy/ontologia e que a reuniao gera rotulos de especialista. |
+| Alinhamento | 5 min | Reforcar que o v0 nao e fuzzy/ontologia e que a revisao gera hipoteses provisoria. |
 | Casos fortes | 10 min | Confirmar relacoes que podem virar base semantica futura. |
 | Casos medios | 10 min | Identificar ajustes de ordem, reason e contexto. |
 | Sob consulta | 10 min | Definir quando itens sem preco podem aparecer. |
@@ -176,6 +188,12 @@ O relatorio inclui:
 - `reason`;
 - URLs dos produtos;
 - `recommended_image_url`;
+- `relation_class`, `relation_type` e `relation_policy_action`;
+- `validation_status`;
+- `requires_project_context` e `requires_installation_check`;
+- `quote_policy`, `quote_reason` e `is_quote_only`;
+- `is_policy_demoted`, `is_policy_blocked`, `policy_notes`;
+- `reason_quality` e `labels`;
 - campos vazios para avaliacao manual.
 
 ## Limitacoes
@@ -185,5 +203,7 @@ O relatorio inclui:
 - Nao mede CTR, impressao ou clique.
 - Nao altera o ranking automaticamente.
 - Nao implementa fuzzy ou ontologia.
+- Nao substitui validacao humana real com clientes da Kouzina.
+- Nao permite inferir comportamento real sem integracao com o site.
 - A avaliacao manual deve ser usada para decidir proximos ajustes editoriais.
 - Esta etapa vem antes de CTR, fuzzy, ontologia e deploy.

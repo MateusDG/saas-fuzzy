@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from .database import SessionLocal, init_db
 from .models import Product, Store
+from .relation_policy import get_relation_policy
 from .recommender import normalize_text, recommend_from_catalog
 
 
@@ -35,6 +36,20 @@ REVIEW_COLUMNS = [
     "source_url",
     "recommended_url",
     "recommended_image_url",
+    "relation_class",
+    "relation_type",
+    "relation_policy_action",
+    "validation_status",
+    "requires_project_context",
+    "requires_installation_check",
+    "quote_policy",
+    "quote_reason",
+    "is_quote_only",
+    "is_policy_demoted",
+    "is_policy_blocked",
+    "policy_notes",
+    "reason_quality",
+    "labels",
     "reviewer_rating",
     "reviewer_comment",
 ]
@@ -52,6 +67,67 @@ def format_optional(value: object) -> str:
     if isinstance(value, Decimal):
         return f"{value:.2f}"
     return str(value)
+
+
+def bool_to_text(value: bool) -> str:
+    return "true" if value else "false"
+
+
+def classify_reason_quality(reason: str) -> str:
+    normalized = normalize_text(reason)
+    strong_markers = {
+        "complementa funcionalmente",
+        "relacao comum em projetos de cozinha",
+    }
+    medium_markers = {
+        "depende do contexto",
+        "sinal auxiliar",
+        "editorial provisoria",
+        "sob consulta",
+    }
+
+    if any(marker in normalized for marker in strong_markers):
+        return "strong"
+    if any(marker in normalized for marker in medium_markers):
+        return "medium"
+    return "generic"
+
+
+def quote_reason_from_policy(quote_policy: str, is_quote_only: bool) -> str:
+    if not is_quote_only:
+        return ""
+
+    mapping = {
+        "allow_if_strong": "Produto sob consulta permitido quando a relacao for forte.",
+        "allow_top3_with_context": "Produto sob consulta permitido no top-3 quando houver contexto.",
+        "demote_if_top1": "Produto sob consulta deve ser rebaixado quando disputar top-1.",
+        "block_if_weak": "Produto sob consulta deve ser bloqueado em relacoes fracas.",
+        "review_only": "Produto sob consulta requer revisao manual nesta fase.",
+    }
+    return mapping.get(quote_policy, "Produto sob consulta requer revisao manual nesta fase.")
+
+
+def build_labels(
+    relation_class: str,
+    relation_type: str,
+    is_quote_only: bool,
+    is_policy_demoted: bool,
+    is_policy_blocked: bool,
+    requires_project_context: bool,
+    requires_installation_check: bool,
+) -> str:
+    labels = [relation_class, relation_type]
+    if is_quote_only:
+        labels.append("quote_only")
+    if is_policy_demoted:
+        labels.append("policy_demoted")
+    if is_policy_blocked:
+        labels.append("policy_blocked")
+    if requires_project_context:
+        labels.append("requires_project_context")
+    if requires_installation_check:
+        labels.append("requires_installation_check")
+    return ",".join(label for label in labels if label)
 
 
 def get_active_store_products(db: Session, store_slug: str = DEFAULT_STORE_SLUG) -> list[Product]:
@@ -129,6 +205,25 @@ def build_review_rows(
             if recommended_product is None:
                 continue
 
+            policy = get_relation_policy(
+                source_product.product_type,
+                recommended_product.product_type,
+            )
+            is_quote_only = normalize_text(recommended_product.availability_text) == "sob consulta"
+            is_policy_blocked = policy.is_blocked
+            is_policy_demoted = policy.is_demoted
+            quote_reason = quote_reason_from_policy(policy.quote_policy, is_quote_only)
+            reason_quality = classify_reason_quality(recommendation.reason)
+            labels = build_labels(
+                relation_class=policy.relation_class,
+                relation_type=policy.relation_type,
+                is_quote_only=is_quote_only,
+                is_policy_demoted=is_policy_demoted,
+                is_policy_blocked=is_policy_blocked,
+                requires_project_context=policy.requires_project_context,
+                requires_installation_check=policy.requires_installation_check,
+            )
+
             rows.append(
                 {
                     "source_product_id": source_product.external_id,
@@ -156,6 +251,20 @@ def build_review_rows(
                         if recommendation.image_url is not None
                         else ""
                     ),
+                    "relation_class": policy.relation_class,
+                    "relation_type": policy.relation_type,
+                    "relation_policy_action": policy.default_action,
+                    "validation_status": policy.validation_status,
+                    "requires_project_context": bool_to_text(policy.requires_project_context),
+                    "requires_installation_check": bool_to_text(policy.requires_installation_check),
+                    "quote_policy": policy.quote_policy,
+                    "quote_reason": quote_reason,
+                    "is_quote_only": bool_to_text(is_quote_only),
+                    "is_policy_demoted": bool_to_text(is_policy_demoted),
+                    "is_policy_blocked": bool_to_text(is_policy_blocked),
+                    "policy_notes": policy.notes,
+                    "reason_quality": reason_quality,
+                    "labels": labels,
                     "reviewer_rating": "",
                     "reviewer_comment": "",
                 }

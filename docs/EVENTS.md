@@ -5,6 +5,8 @@ Na Fase 2, os eventos sao validados pela API e persistidos em
 
 ## Eventos Permitidos
 
+Eventos atuais de MVP:
+
 ```text
 page_view
 product_view
@@ -12,15 +14,46 @@ recommendation_impression
 recommendation_click
 ```
 
+Eventos preparados para fase futura de funil (sem analise nesta etapa):
+
+```text
+widget_opened
+product_context_loaded
+recommendations_requested
+recommendations_rendered
+recommendation_expanded
+recommendation_dismissed
+quote_requested
+add_to_cart_clicked
+alternative_requested
+session_ended
+```
+
 ## Campos Coletados
 
 - `event_type`;
+- `event_name` (opcional, com fallback para `event_type`);
 - `anonymous_id`;
 - `session_id`;
 - `page_url`;
 - `product_id`;
+- `source_product_id`;
+- `source_product_type`;
 - `widget_id`;
 - `recommended_product_id`;
+- `recommended_product_type`;
+- `rank`;
+- `score`;
+- `relation_class`;
+- `relation_type`;
+- `relation_policy_action`;
+- `validation_status`;
+- `is_quote_only`;
+- `quote_reason`;
+- `environment`;
+- `brand`;
+- `price_band`;
+- `funnel_stage`;
 - `metadata` nao sensivel.
 
 Na persistencia, o backend mantem apenas chaves tecnicas permitidas em

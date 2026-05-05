@@ -154,7 +154,11 @@ def test_events_saves_recommendation_event(client: TestClient, db_session: Sessi
     assert saved_event.anonymous_id == "anon_123"
     assert saved_event.product_external_id == "12345"
     assert saved_event.recommended_product_external_id == "mock-001"
-    assert saved_event.event_metadata == {"score": 0.91}
+    assert saved_event.event_metadata["event_name"] == "recommendation_click"
+    assert saved_event.event_metadata["source_product_id"] == "12345"
+    assert saved_event.event_metadata["recommended_product_id"] == "mock-001"
+    assert saved_event.event_metadata["score"] == 0.91
+    assert "email" not in saved_event.event_metadata
 
 
 def test_recommendations_fallback_when_catalog_is_empty(client: TestClient) -> None:
@@ -212,7 +216,7 @@ def test_catalog_commercial_relationships_score_as_complementary() -> None:
         unrelated_score, _ = score_candidate(current, unrelated)
 
         assert complementary_score > unrelated_score
-        assert "Produto complementar ao item visualizado." in complementary_reasons
+        assert "Complementa funcionalmente o produto atual." in complementary_reasons
 
 
 def test_environment_is_not_treated_as_product_type_relationship() -> None:
@@ -221,7 +225,7 @@ def test_environment_is_not_treated_as_product_type_relationship() -> None:
 
     _, reasons = score_candidate(current, environment_as_type)
 
-    assert "Produto complementar ao item visualizado." not in reasons
+    assert "Complementa funcionalmente o produto atual." not in reasons
 
 
 def test_cuba_recommends_misturador_without_returning_current_product() -> None:
@@ -238,7 +242,7 @@ def test_cuba_recommends_misturador_without_returning_current_product() -> None:
     recommendation_ids = [item.product_id for item in recommendations]
     assert recommendation_ids[0] == "misturador"
     assert "cuba" not in recommendation_ids
-    assert "Produto complementar ao item visualizado." in recommendations[0].reason
+    assert "Complementa funcionalmente o produto atual." in recommendations[0].reason
 
 
 def test_unavailable_candidate_is_penalized() -> None:
@@ -272,6 +276,44 @@ def test_close_price_increases_score() -> None:
     far_price_score, _ = score_candidate(current, far_price)
 
     assert close_price_score > far_price_score
+
+
+def test_forbidden_relation_is_blocked_by_policy() -> None:
+    current = make_product("lavadora", product_type="Lavadora")
+    forbidden = make_product("adega", product_type="Adega")
+
+    score, reasons = score_candidate(current, forbidden)
+
+    assert score <= -100
+    assert "Relacao provisoriamente bloqueada pela politica editorial." in reasons
+
+
+def test_weak_relation_is_demoted_by_policy() -> None:
+    current = make_product("acessorio", product_type="Acessorio de Cozinha")
+    weak_candidate = make_product("cuba", product_type="Cuba")
+
+    weak_score, weak_reasons = score_candidate(current, weak_candidate)
+
+    assert weak_score > -100
+    assert "Relacao provisoria fraca; prioridade reduzida." in weak_reasons
+
+
+def test_contextual_relation_is_marked_in_reason() -> None:
+    current = make_product("adega", product_type="Adega")
+    candidate = make_product("cervejeira", product_type="Cervejeira")
+
+    _, reasons = score_candidate(current, candidate)
+
+    assert "Pode fazer sentido em projeto gourmet, mas depende do contexto." in reasons
+
+
+def test_universal_relation_receives_strong_reason() -> None:
+    current = make_product("cooktop", product_type="Cooktop")
+    candidate = make_product("coifa", product_type="Coifa")
+
+    _, reasons = score_candidate(current, candidate)
+
+    assert "Relacao comum em projetos de cozinha." in reasons
 
 
 def test_recommendations_are_sorted_by_score(
@@ -432,8 +474,74 @@ def test_review_recommendations_generates_expected_csv(
     assert all(row["recommended_url"] for row in rows)
     assert any(row["recommended_image_url"] for row in rows)
     assert rows[0]["recommended_product_id"] == "recommended-misturador"
+    assert rows[0]["relation_class"]
+    assert rows[0]["relation_type"]
+    assert rows[0]["relation_policy_action"]
+    assert rows[0]["validation_status"]
+    assert rows[0]["requires_project_context"] in {"true", "false"}
+    assert rows[0]["requires_installation_check"] in {"true", "false"}
+    assert rows[0]["quote_policy"]
+    assert "is_policy_demoted" in rows[0]
+    assert "is_policy_blocked" in rows[0]
+    assert rows[0]["reason_quality"]
+    assert rows[0]["labels"]
     assert rows[0]["reviewer_rating"] == ""
     assert rows[0]["reviewer_comment"] == ""
+
+
+def test_review_csv_marks_quote_policy_fields_for_sob_consulta(
+    db_session: Session,
+    tmp_path: Path,
+) -> None:
+    store = create_store(db_session)
+    create_db_product(
+        db_session,
+        store,
+        "source-cooktop",
+        name="Cooktop de teste",
+        product_type="Cooktop",
+        category="Cozinha",
+        brand="Franke",
+        price=Decimal("9000.00"),
+        availability_text="Disponivel",
+    )
+    create_db_product(
+        db_session,
+        store,
+        "recommended-coifa-sob-consulta",
+        name="Coifa sob consulta",
+        product_type="Coifa",
+        category="Coifas",
+        brand="Franke",
+        price=None,
+        available=True,
+        availability_text="Sob consulta",
+    )
+    db_session.commit()
+    output_path = tmp_path / "recommendation_review_quote.csv"
+
+    source_count, row_count = generate_review_csv(
+        db_session,
+        output_path=output_path,
+        limit_products=1,
+        top_k=1,
+        product_type="Cooktop",
+    )
+
+    assert source_count == 1
+    assert row_count == 1
+
+    import csv
+
+    with output_path.open("r", encoding="utf-8", newline="") as csv_file:
+        row = next(csv.DictReader(csv_file))
+
+    assert row["recommended_product_id"] == "recommended-coifa-sob-consulta"
+    assert row["relation_class"] == "universal"
+    assert row["quote_policy"] == "allow_if_strong"
+    assert row["is_quote_only"] == "true"
+    assert row["quote_reason"]
+    assert "Produto sob consulta" in row["reason"]
 
 
 def test_recommendations_fallback_when_current_product_is_missing(
@@ -693,5 +801,108 @@ def test_recommender_can_recommend_sob_consulta_product() -> None:
     score, reasons = score_candidate(current, candidate)
 
     assert score > 0
-    assert "Produto sob consulta." in reasons
+    assert (
+        "Produto sob consulta: recomendado apenas quando houver intencao consultiva."
+        in reasons
+    )
     assert "Produto indisponivel no catalogo." not in reasons
+
+
+def test_sob_consulta_weak_relations_do_not_dominate_top3() -> None:
+    current = make_product("current", product_type="Coifa", price=Decimal("10000.00"))
+    strong_candidate = make_product(
+        "strong-cooktop",
+        product_type="Cooktop",
+        availability_text="Disponivel",
+        price=Decimal("9500.00"),
+    )
+    weak_quote_1 = make_product(
+        "weak-quote-1",
+        product_type="Acessorio de Cozinha",
+        availability_text="Sob consulta",
+        price=None,
+    )
+    weak_quote_2 = make_product(
+        "weak-quote-2",
+        product_type="Dispenser de Agua",
+        availability_text="Sob consulta",
+        price=None,
+    )
+    weak_quote_3 = make_product(
+        "weak-quote-3",
+        product_type="Conjugada",
+        availability_text="Sob consulta",
+        price=None,
+    )
+
+    recommendations = recommend_from_catalog(
+        current,
+        [current, strong_candidate, weak_quote_1, weak_quote_2, weak_quote_3],
+        limit=4,
+    )
+
+    top3 = recommendations[:3]
+    weak_quote_count = sum(
+        1
+        for item in top3
+        if "Produto sob consulta fora de relacao forte: usar com cautela." in item.reason
+    )
+    assert weak_quote_count <= 1
+    assert any(item.product_id == "strong-cooktop" for item in recommendations)
+
+
+def test_events_accept_future_funnel_payload(client: TestClient, db_session: Session) -> None:
+    response = client.post(
+        "/events",
+        json={
+            "event_name": "recommendations_rendered",
+            "anonymous_id": "anon_future_1",
+            "session_id": "sess_future_1",
+            "page_url": "http://localhost:5500/demo.html",
+            "source_product_id": "source-001",
+            "source_product_type": "Cooktop",
+            "recommended_product_id": "recommended-001",
+            "recommended_product_type": "Coifa",
+            "rank": 1,
+            "score": 92.0,
+            "relation_class": "universal",
+            "relation_type": "complement",
+            "relation_policy_action": "boost",
+            "validation_status": "agent_hypothesis",
+            "is_quote_only": False,
+            "quote_reason": "",
+            "environment": "Cozinha Gourmet",
+            "brand": "Franke",
+            "price_band": "high",
+            "funnel_stage": "rendered",
+            "metadata": {"email": "blocked@example.com", "score": 91.5},
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["event_type"] == "recommendations_rendered"
+
+    saved_event = db_session.query(RecommendationEvent).order_by(RecommendationEvent.id.desc()).first()
+    assert saved_event is not None
+    assert saved_event.product_external_id == "source-001"
+    assert saved_event.recommended_product_external_id == "recommended-001"
+    assert saved_event.event_metadata["event_name"] == "recommendations_rendered"
+    assert saved_event.event_metadata["source_product_type"] == "Cooktop"
+    assert saved_event.event_metadata["relation_class"] == "universal"
+    assert saved_event.event_metadata["score"] == 92.0
+    assert "email" not in saved_event.event_metadata
+
+
+def test_events_require_event_type_or_event_name(client: TestClient) -> None:
+    response = client.post(
+        "/events",
+        json={
+            "anonymous_id": "anon_missing_event",
+            "session_id": "sess_missing_event",
+            "page_url": "http://localhost:5500/demo.html",
+            "metadata": {},
+        },
+    )
+
+    assert response.status_code == 422

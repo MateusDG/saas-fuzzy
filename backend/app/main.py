@@ -15,9 +15,26 @@ from .settings import get_settings
 settings = get_settings()
 
 SAFE_METADATA_KEYS = {
+    "event_name",
+    "timestamp",
+    "source_product_id",
+    "source_product_type",
+    "recommended_product_id",
+    "recommended_product_type",
+    "rank",
     "recommendation_count",
     "recommended_product_ids",
     "score",
+    "relation_class",
+    "relation_type",
+    "relation_policy_action",
+    "validation_status",
+    "is_quote_only",
+    "quote_reason",
+    "environment",
+    "brand",
+    "price_band",
+    "funnel_stage",
 }
 
 
@@ -54,6 +71,32 @@ def sanitize_metadata(metadata: dict) -> dict:
     }
 
 
+def build_event_metadata(event: EventIn) -> dict:
+    metadata = sanitize_metadata(event.metadata)
+    event_data = {
+        "event_name": event.resolved_event_name,
+        "timestamp": event.timestamp.isoformat() if event.timestamp else None,
+        "source_product_id": event.source_product_id or event.product_id,
+        "source_product_type": event.source_product_type,
+        "recommended_product_id": event.recommended_product_id,
+        "recommended_product_type": event.recommended_product_type,
+        "rank": event.rank,
+        "score": event.score,
+        "relation_class": event.relation_class,
+        "relation_type": event.relation_type,
+        "relation_policy_action": event.relation_policy_action,
+        "validation_status": event.validation_status,
+        "is_quote_only": event.is_quote_only,
+        "quote_reason": event.quote_reason,
+        "environment": event.environment,
+        "brand": event.brand,
+        "price_band": event.price_band,
+        "funnel_stage": event.funnel_stage,
+    }
+    metadata.update({key: value for key, value in event_data.items() if value is not None})
+    return sanitize_metadata(metadata)
+
+
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse(
@@ -66,19 +109,20 @@ def health() -> HealthResponse:
 @app.post("/events", response_model=EventResponse)
 def create_event(event: EventIn, db: Session = Depends(get_db)) -> EventResponse:
     timestamp = datetime.now(UTC)
+    resolved_event_name = event.resolved_event_name
 
     try:
         store = db.query(Store).filter(Store.slug == "kouzina").one_or_none()
         recommendation_event = RecommendationEvent(
             store_id=store.id if store else None,
-            event_type=event.event_type,
+            event_type=resolved_event_name,
             anonymous_id=event.anonymous_id,
             session_id=event.session_id,
             page_url=event.page_url,
-            product_external_id=event.product_id,
+            product_external_id=event.source_product_id or event.product_id,
             widget_id=event.widget_id,
             recommended_product_external_id=event.recommended_product_id,
-            event_metadata=sanitize_metadata(event.metadata),
+            event_metadata=build_event_metadata(event),
         )
         db.add(recommendation_event)
         db.commit()
@@ -90,7 +134,7 @@ def create_event(event: EventIn, db: Session = Depends(get_db)) -> EventResponse
 
     return EventResponse(
         received=True,
-        event_type=event.event_type,
+        event_type=resolved_event_name,
         timestamp=timestamp,
     )
 

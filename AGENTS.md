@@ -960,3 +960,20 @@ Evitar decisões que aumentem complexidade sem gerar valor imediato para:
 3. evento registrado;
 4. métrica calculada;
 5. base acadêmica documentada.
+
+---
+
+## 24. Nota adicional da Fase 4.9
+
+Na Fase 4.9, as conclusoes da reuniao simulada de especialistas (Fase 4.8)
+devem ser tratadas como hipoteses provisoria.
+
+Nesta etapa:
+
+- nao houve validacao humana final com a Kouzina;
+- nao houve analise de comportamento real de clientes;
+- nao e permitido inventar dados de funil, CTR, conversao ou receita.
+
+Objetivo da fase: aplicar guardrails editoriais simples no ranking v0, reduzir
+falsos positivos e preparar telemetria para validacao futura com dados reais,
+apos integracao da API/widget ao site.
