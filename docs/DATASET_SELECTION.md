@@ -109,6 +109,25 @@ Justificativa:
   metadados para baseline de conteudo/categoria;
 - facilita evolucao futura para ontologia e fuzzy.
 
+## Decisao Pratica Da Fase 5.1
+
+Para execucao inicial do baseline offline, a decisao operacional desta fase e:
+
+- dataset principal: Amazon Reviews 2023;
+- recorte de categorias: `Home_and_Kitchen` e `Appliances`;
+- interacao positiva: `rating >= 4`;
+- filtro de qualidade de item: `average_rating >= 4.0`;
+- suporte minimo de item: `rating_number >= 20` (ou equivalente disponivel);
+- proxy premium: preco por percentil de categoria;
+  - principal: `>= P75` (`premium` + `ultra_premium`);
+  - analise opcional restrita: `>= P90`.
+
+Esta decisao e util para reproducao da Fase 5.1, mas continua:
+
+- derivada de recorte tecnico;
+- pendente de validacao por comportamento real;
+- sem pretensao de validar perfil high-end de consumidor.
+
 ## Limitacoes De Adaptacao Para O Dominio Kouzina
 
 - datasets publicos raramente refletem posicionamento high-end;
@@ -116,6 +135,8 @@ Justificativa:
 - sinal de preco/premium pode ser incompleto;
 - comportamento de usuarios em datasets publicos pode divergir de publico
   premium consultivo.
+- proxy premium por preco nao identifica renda, classe social ou intencao
+  consultiva real.
 
 Essas limitacoes devem ser declaradas explicitamente na analise de resultados.
 

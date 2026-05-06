@@ -60,6 +60,8 @@ Documentos da fase:
 - `docs/EVALUATION_PROTOCOL.md`
 - `docs/DATASET_SELECTION.md`
 - `data/public/README.md`
+- `docs/AMAZON_REVIEWS_2023_PREPROCESSING.md`
+- `docs/RESULTS_PHASE_5_BASELINE.md`
 
 ## Estrutura
 
@@ -452,6 +454,22 @@ Saidas padrao:
 
 - `reports/evaluation/metrics_summary.json`
 - `reports/evaluation/per_user_metrics.csv`
+
+## Preprocessar Amazon Reviews 2023 (Fase 5.1)
+
+Com arquivos locais em `data/public/raw/`:
+
+```powershell
+cd backend
+python -m app.preprocess_amazon_reviews_2023 --reviews-file ../data/public/raw/<reviews>.jsonl.gz --metadata-file ../data/public/raw/<metadata>.jsonl.gz --output-dir ../data/public/processed --categories Home_and_Kitchen Appliances --premium-percentile 0.75 --min-rating 4 --min-item-interactions 20 --min-user-interactions 2
+```
+
+Depois execute:
+
+```powershell
+python -m app.run_offline_evaluation --top-k 5
+python -m app.run_offline_evaluation --top-k 10
+```
 
 ## Congelar baseline v0 (Fase 5)
 

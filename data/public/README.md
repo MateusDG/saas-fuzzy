@@ -26,11 +26,21 @@ data/public/
 
 ### `raw/`
 
-Coloque aqui os arquivos brutos baixados manualmente (fora do Git), por
-exemplo:
+Coloque aqui os arquivos brutos baixados manualmente (fora do Git).
 
-- `interactions_raw.csv`
-- `items_raw.csv`
+Para a Fase 5.1 (Amazon Reviews 2023), usar:
+
+- arquivo de reviews/interacoes (`.jsonl` ou `.jsonl.gz`);
+- arquivo de metadata de itens (`.jsonl` ou `.jsonl.gz`).
+
+Exemplos de nomes locais (apenas ilustrativos):
+
+- `raw/Home_and_Kitchen.jsonl.gz`
+- `raw/meta_Home_and_Kitchen.jsonl.gz`
+- `raw/Appliances.jsonl.gz`
+- `raw/meta_Appliances.jsonl.gz`
+
+O preprocessador aceita caminhos configuraveis por CLI, sem assumir nome fixo.
 
 ### `processed/`
 
@@ -79,6 +89,35 @@ Colunas recomendadas:
 - `brand`
 - `environment`
 - `price_band`
+
+## Preprocessamento Amazon Reviews 2023
+
+Comando base:
+
+```powershell
+cd backend
+python -m app.preprocess_amazon_reviews_2023 `
+  --reviews-file ../data/public/raw/<reviews>.jsonl.gz `
+  --metadata-file ../data/public/raw/<metadata>.jsonl.gz `
+  --output-dir ../data/public/processed `
+  --categories Home_and_Kitchen Appliances `
+  --premium-percentile 0.75 `
+  --min-rating 4 `
+  --min-item-interactions 20 `
+  --min-user-interactions 2
+```
+
+Saidas obrigatorias:
+
+- `data/public/processed/interactions_train.csv`
+- `data/public/processed/interactions_test.csv`
+- `data/public/processed/items.csv`
+- `reports/evaluation/dataset_profile.json`
+
+Regra metodologica desta fase:
+
+- premium e apenas proxy de produto (preco por percentil), nao perfil real de
+  consumidor.
 
 ## Execucao Offline
 
