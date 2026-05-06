@@ -182,3 +182,18 @@ python -m app.run_offline_evaluation --top-k 10
 
 - arquivos grandes de dataset bruto/processado nao devem ser commitados;
 - manter apenas codigo, documentacao e artefatos leves de configuracao.
+
+## Politica De Artefatos Da Execucao
+
+Artefatos recomendados para commit:
+
+- `docs/RESULTS_PHASE_5_BASELINE.md`;
+- `reports/evaluation/dataset_profile.json` (somente higienizado, sem caminhos
+  absolutos locais).
+
+Artefatos recomendados para manter locais (nao versionar):
+
+- `reports/evaluation/metrics_summary.json`;
+- `reports/evaluation/per_user_metrics.csv`;
+- `data/public/raw/*`;
+- `data/public/processed/*`.

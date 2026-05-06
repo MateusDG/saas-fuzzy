@@ -1,9 +1,9 @@
 {
   "dataset": "Amazon Reviews 2023",
-  "executed_at_utc": "2026-05-06T15:23:21.271292+00:00",
+  "executed_at_utc": "2026-05-06T15:31:55.028915+00:00",
   "input_files": {
-    "reviews_file": "C:\\Users\\mateu\\Desktop\\saas-fuzzy\\data\\public\\raw\\Appliances.jsonl",
-    "metadata_file": "C:\\Users\\mateu\\Desktop\\saas-fuzzy\\data\\public\\raw\\meta_Appliances.jsonl"
+    "reviews_file": "data/public/raw/Appliances.jsonl",
+    "metadata_file": "data/public/raw/meta_Appliances.jsonl"
   },
   "categories_included": [
     "Appliances"

@@ -41,6 +41,15 @@ def resolve_path(path: Path) -> Path:
     return (Path.cwd() / path).resolve()
 
 
+def to_project_relative_or_name(path: Path) -> str:
+    resolved = path.resolve()
+    project_root = PROJECT_ROOT.resolve()
+    try:
+        return str(resolved.relative_to(project_root)).replace("\\", "/")
+    except ValueError:
+        return resolved.name
+
+
 def _normalize_tokens(value: str) -> set[str]:
     normalized = value.strip().lower().replace("&", " and ").replace("_", " ").replace("-", " ")
     tokens = re.findall(r"[a-z0-9]+", normalized)
@@ -627,8 +636,8 @@ def preprocess(args: argparse.Namespace) -> dict[str, Any]:
         "dataset": "Amazon Reviews 2023",
         "executed_at_utc": datetime.now(UTC).isoformat(),
         "input_files": {
-            "reviews_file": str(reviews_path),
-            "metadata_file": str(metadata_path),
+            "reviews_file": to_project_relative_or_name(reviews_path),
+            "metadata_file": to_project_relative_or_name(metadata_path),
         },
         "categories_included": args.categories,
         "filters_applied": {

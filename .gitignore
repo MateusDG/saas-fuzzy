@@ -27,3 +27,5 @@ data/public/hf_parquet/*
 reports/*.csv
 reports/*.xlsx
 reports/*.html
+reports/evaluation/per_user_metrics.csv
+reports/evaluation/metrics_summary.json
