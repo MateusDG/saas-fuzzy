@@ -1,6 +1,6 @@
 {
   "dataset": "Amazon Reviews 2023",
-  "executed_at_utc": "2026-05-06T14:54:49.582336+00:00",
+  "executed_at_utc": "2026-05-06T15:23:21.271292+00:00",
   "input_files": {
     "reviews_file": "C:\\Users\\mateu\\Desktop\\saas-fuzzy\\data\\public\\raw\\Appliances.jsonl",
     "metadata_file": "C:\\Users\\mateu\\Desktop\\saas-fuzzy\\data\\public\\raw\\meta_Appliances.jsonl"
@@ -14,8 +14,8 @@
     "min_item_interactions": 20,
     "min_user_interactions": 2,
     "require_verified_purchase": false,
-    "max_users": 5000,
-    "max_items": 5000
+    "max_users": null,
+    "max_items": null
   },
   "percentile_thresholds_by_category": {
     "Appliances": {
@@ -25,10 +25,10 @@
     }
   },
   "counts": {
-    "users": 3746,
-    "items": 2176,
-    "train_interactions": 4113,
-    "test_interactions": 3746,
+    "users": 6651,
+    "items": 2798,
+    "train_interactions": 7368,
+    "test_interactions": 6651,
     "premium_items_before_split": 4916,
     "items_removed_missing_price": 28083,
     "items_removed_low_interactions": 15428,
