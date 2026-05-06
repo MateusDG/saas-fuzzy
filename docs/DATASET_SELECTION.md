@@ -114,7 +114,8 @@ Justificativa:
 Para execucao inicial do baseline offline, a decisao operacional desta fase e:
 
 - dataset principal: Amazon Reviews 2023;
-- recorte de categorias: `Home_and_Kitchen` e `Appliances`;
+- recorte de referencia: `Home_and_Kitchen` e `Appliances`;
+- piloto atual controlado: `Appliances`;
 - interacao positiva: `rating >= 4`;
 - filtro de qualidade de item: `average_rating >= 4.0`;
 - suporte minimo de item: `rating_number >= 20` (ou equivalente disponivel);

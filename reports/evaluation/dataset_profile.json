@@ -1,0 +1,44 @@
+{
+  "dataset": "Amazon Reviews 2023",
+  "executed_at_utc": "2026-05-06T14:54:49.582336+00:00",
+  "input_files": {
+    "reviews_file": "C:\\Users\\mateu\\Desktop\\saas-fuzzy\\data\\public\\raw\\Appliances.jsonl",
+    "metadata_file": "C:\\Users\\mateu\\Desktop\\saas-fuzzy\\data\\public\\raw\\meta_Appliances.jsonl"
+  },
+  "categories_included": [
+    "Appliances"
+  ],
+  "filters_applied": {
+    "premium_percentile": 0.75,
+    "min_rating": 4.0,
+    "min_item_interactions": 20,
+    "min_user_interactions": 2,
+    "require_verified_purchase": false,
+    "max_users": 5000,
+    "max_items": 5000
+  },
+  "percentile_thresholds_by_category": {
+    "Appliances": {
+      "p75": 48.9175,
+      "p90": 109.99000000000001,
+      "premium_threshold": 48.9175
+    }
+  },
+  "counts": {
+    "users": 3746,
+    "items": 2176,
+    "train_interactions": 4113,
+    "test_interactions": 3746,
+    "premium_items_before_split": 4916,
+    "items_removed_missing_price": 28083,
+    "items_removed_low_interactions": 15428,
+    "items_removed_low_average_rating": 25880,
+    "users_removed_low_interactions": 216476
+  },
+  "seed": 42,
+  "validation_status": "pending_client_data",
+  "notes": [
+    "Premium is treated as a product-level proxy (price percentile), not as consumer profile validation.",
+    "This artifact is derived from offline public data preparation and remains pending real behavior validation."
+  ]
+}

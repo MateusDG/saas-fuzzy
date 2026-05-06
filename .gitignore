@@ -15,6 +15,15 @@ build/
 data/products_kouzina_official.csv
 data/products_kouzina_official.xlsx
 data/raw/
+data/public/raw/*
+!data/public/raw/.gitkeep
+data/public/processed/*
+!data/public/processed/.gitkeep
+data/public/hf_cache/*
+!data/public/hf_cache/.gitkeep
+data/public/hf_parquet/*
+!data/public/hf_parquet/.gitkeep
+!data/public/README.md
 reports/*.csv
 reports/*.xlsx
 reports/*.html

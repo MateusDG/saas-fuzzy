@@ -21,10 +21,14 @@ Tambem gera um perfil leve da execucao em:
 
 Dataset principal: Amazon Reviews 2023.
 
-Categorias iniciais:
+Categorias de referencia para a Fase 5:
 
 - `Home_and_Kitchen`
 - `Appliances`
+
+Execucao piloto atual (antes da Fase 5.2):
+
+- somente `Appliances`.
 
 Regra desta fase:
 
@@ -49,6 +53,23 @@ Campos esperados (quando disponiveis):
 Nao ha download automatico no repositorio.
 
 ## Comando De Preprocessamento
+
+Piloto atual (`Appliances`):
+
+```powershell
+cd backend
+python -m app.preprocess_amazon_reviews_2023 `
+  --reviews-file ../data/public/raw/Appliances.jsonl `
+  --metadata-file ../data/public/raw/meta_Appliances.jsonl `
+  --output-dir ../data/public/processed `
+  --categories Appliances `
+  --premium-percentile 0.75 `
+  --min-rating 4 `
+  --min-item-interactions 20 `
+  --min-user-interactions 2
+```
+
+Comando generico (quando houver outras categorias locais):
 
 ```powershell
 cd backend

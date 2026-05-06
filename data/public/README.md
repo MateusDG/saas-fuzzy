@@ -33,12 +33,15 @@ Para a Fase 5.1 (Amazon Reviews 2023), usar:
 - arquivo de reviews/interacoes (`.jsonl` ou `.jsonl.gz`);
 - arquivo de metadata de itens (`.jsonl` ou `.jsonl.gz`).
 
-Exemplos de nomes locais (apenas ilustrativos):
+Piloto atual (executado localmente):
+
+- `raw/Appliances.jsonl`
+- `raw/meta_Appliances.jsonl`
+
+Exemplos de nomes locais adicionais (etapas posteriores):
 
 - `raw/Home_and_Kitchen.jsonl.gz`
 - `raw/meta_Home_and_Kitchen.jsonl.gz`
-- `raw/Appliances.jsonl.gz`
-- `raw/meta_Appliances.jsonl.gz`
 
 O preprocessador aceita caminhos configuraveis por CLI, sem assumir nome fixo.
 
@@ -97,10 +100,10 @@ Comando base:
 ```powershell
 cd backend
 python -m app.preprocess_amazon_reviews_2023 `
-  --reviews-file ../data/public/raw/<reviews>.jsonl.gz `
-  --metadata-file ../data/public/raw/<metadata>.jsonl.gz `
+  --reviews-file ../data/public/raw/Appliances.jsonl `
+  --metadata-file ../data/public/raw/meta_Appliances.jsonl `
   --output-dir ../data/public/processed `
-  --categories Home_and_Kitchen Appliances `
+  --categories Appliances `
   --premium-percentile 0.75 `
   --min-rating 4 `
   --min-item-interactions 20 `

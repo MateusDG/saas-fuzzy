@@ -16,7 +16,8 @@ inventar metricas.
 ## Dataset E Recorte
 
 - Dataset: Amazon Reviews 2023
-- Categorias: `Home_and_Kitchen`, `Appliances`
+- Piloto atual: `Appliances`
+- Recorte de referencia para expansao: `Home_and_Kitchen`, `Appliances`
 - Regra premium (proxy): `price >= P75` por categoria
 - Observacao: premium e proxy de produto, nao perfil real de consumidor
 
