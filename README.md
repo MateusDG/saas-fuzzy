@@ -2,7 +2,7 @@
 
 MVP comercial minimo de recomendacao para o site Kouzina Club.
 
-Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7 e 4.9:
+Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.9 e inicio da Fase 5:
 
 - API FastAPI minima.
 - `GET /health`.
@@ -22,6 +22,9 @@ Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.
 - Guardrails editoriais no ranking v0 para reduzir falsos positivos.
 - Enriquecimento do review CSV/HTML com campos de politica provisoria.
 - Preparacao de telemetria para analise futura de funil com dados reais.
+- Protocolo inicial de avaliacao academica offline (Fase 5).
+- Baselines offline de popularidade e conteudo/categoria (Fase 5).
+- Congelamento do ranking v0 em snapshot com fingerprint (Fase 5).
 
 Fora de escopo: fuzzy, ontologia, integracao Tray, painel, login, deploy,
 ranking sofisticado, crawler, scraping e multi-loja completo.
@@ -42,18 +45,38 @@ Documentos da fase:
 - `docs/RELATION_HYPOTHESES_PHASE_4_9.md`
 - `docs/FUTURE_FUNNEL_ANALYTICS_PLAN.md`
 
+## Fase 5
+
+A Fase 5 cria a base academica reproduzivel do projeto, ainda sem ontologia e
+sem fuzzy:
+
+- protocolo de avaliacao offline;
+- selecao e governanca de dataset publico;
+- scripts de baseline simples;
+- congelamento do comportamento do ranking v0.
+
+Documentos da fase:
+
+- `docs/EVALUATION_PROTOCOL.md`
+- `docs/DATASET_SELECTION.md`
+- `data/public/README.md`
+
 ## Estrutura
 
 ```text
 backend/
   app/
     __init__.py
+    evaluation_baselines.py
+    evaluation_metrics.py
+    freeze_v0_baseline.py
     main.py
     database.py
     export_review_pack.py
     models.py
     recommender.py
     review_recommendations.py
+    run_offline_evaluation.py
     schemas.py
     seed.py
     settings.py
@@ -64,6 +87,10 @@ widget/
   demo.html
   kouzina-reco.js
 data/
+  public/
+    raw/
+    processed/
+    README.md
   products_seed.csv
   products_kouzina_official.csv  # local, ignorado pelo Git
 docker-compose.yml
@@ -409,6 +436,33 @@ Detalhes:
 - `docs/RELATION_POLICY.md`
 - `docs/RECOMMENDATION_REVIEW.md`
 - `docs/FUTURE_FUNNEL_ANALYTICS_PLAN.md`
+- `docs/EVALUATION_PROTOCOL.md`
+- `docs/DATASET_SELECTION.md`
+
+## Rodar avaliacao offline (Fase 5)
+
+Com os CSVs preparados em `data/public/processed/`:
+
+```powershell
+cd backend
+python -m app.run_offline_evaluation --top-k 10
+```
+
+Saidas padrao:
+
+- `reports/evaluation/metrics_summary.json`
+- `reports/evaluation/per_user_metrics.csv`
+
+## Congelar baseline v0 (Fase 5)
+
+```powershell
+cd backend
+python -m app.freeze_v0_baseline --limit-products 30 --top-k 4
+```
+
+Saida padrao:
+
+- `reports/baselines/v0_baseline_snapshot.json`
 
 ## Rodar testes
 
