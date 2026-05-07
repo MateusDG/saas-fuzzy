@@ -1,62 +1,65 @@
-# Kouzina Reco — Mapa Visual do MVP
+# Kouzina Reco Frontend Visual
 
-Frontend local, estático e didático para entender o estado atual do MVP Kouzina Reco.
+Frontend didatico da Fase 5.5. Ele apresenta o funcionamento atual do Kouzina Reco para avaliadores, professores, stakeholders, clientes futuros e equipe tecnica.
 
-Ele não é painel administrativo, não tem login, não faz deploy, não integra Tray e não coleta dados pessoais.
+Esta interface nao e painel administrativo, nao altera ranking, nao altera widget, nao altera API publica e nao implementa fuzzy, ontologia ou recomendador hibrido.
+
+## Stack
+
+- Vite
+- React
+- TypeScript
+- Recharts
+- lucide-react
+- CSS autoral em `src/styles.css`
 
 ## Como rodar
 
-Em um terminal:
-
 ```powershell
 cd frontend
-python -m http.server 5600
+npm install
+npm run dev
 ```
 
 Abra:
 
 ```text
-http://localhost:5600
+http://localhost:5173
 ```
 
-## API esperada
+## API local
 
-O testador visual assume a API em:
+O playground usa por padrao o proxy `/api-local`, configurado no Vite para encaminhar chamadas para:
 
 ```text
 http://localhost:8000
 ```
 
-Para rodar a API:
+Para testar a API real diretamente, rode o backend:
 
 ```powershell
 docker compose up -d
 cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-Se o navegador bloquear por CORS, confirme que `ALLOWED_ORIGINS` inclui:
+Depois use o playground visual para chamar:
 
-```text
-http://localhost:5600
+- `GET /health`
+- `GET /recommendations`
+- `POST /events`
+
+## Build
+
+```powershell
+npm run build
 ```
 
-## O que esta área mostra
-
-- Visão geral do MVP.
-- Linha do tempo das fases 1, 2, 3 e 4.2 a 4.6.
-- Arquitetura widget, API, PostgreSQL, ranking v0 e fallback.
-- Fluxo do widget.
-- Endpoints `/health`, `/recommendations` e `/events`.
-- Testador visual da API.
-- Ranking v0 explicado por barras.
-- Modelo de dados atual.
-- Privacidade e LGPD.
-- Catálogo, importação e relatório de revisão qualitativa.
+O build gera `frontend/dist/`, que deve continuar ignorado pelo Git.
 
 ## Limites
 
-Esta área usa apenas HTML, CSS e JavaScript puro. Ela não modifica o widget principal e não adiciona dependências.
+- Nao usa dados reais de clientes.
+- Nao mostra CTR real, conversao real ou funil real.
+- Graficos de avaliacao usam os artefatos versionados da Fase 5.
+- Recomendacoes exibidas no playground so sao reais quando a API local esta rodando.

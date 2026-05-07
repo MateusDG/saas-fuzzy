@@ -25,6 +25,8 @@ Este repositorio implementa a base local das Fases 1, 2, 3, 4, 4.2, 4.3, 4.4, 4.
 - Protocolo inicial de avaliacao academica offline (Fase 5).
 - Baselines offline de popularidade e conteudo/categoria (Fase 5).
 - Congelamento do ranking v0 em snapshot com fingerprint (Fase 5).
+- Frontend visual didatico em Vite + React + TypeScript para explicar o
+  funcionamento completo do sistema ate a Fase 5.5.
 
 Fora de escopo: fuzzy, ontologia, integracao Tray, painel, login, deploy,
 ranking sofisticado, crawler, scraping e multi-loja completo.
@@ -66,6 +68,7 @@ Documentos da fase:
 - `docs/BACKEND_STRUCTURE.md`
 - `docs/DATABASE_MIGRATIONS.md`
 - `docs/PHASE_5_3_1_BACKEND_AUDIT.md`
+- `docs/PHASE_5_5_FRONTEND_VISUAL_MAP.md`
 
 ## Estrutura
 
@@ -116,6 +119,13 @@ backend/
 widget/
   demo.html
   kouzina-reco.js
+frontend/
+  package.json
+  src/
+    App.tsx
+    components/
+    data/
+    services/
 data/
   public/
     raw/
@@ -337,6 +347,27 @@ O widget deve:
 O `widget/demo.html` esta configurado para demonstrar um `product_id` real do
 catalogo oficial autorizado (`119`). Se apenas o seed ficticio estiver
 importado, a API usa fallback mockado para manter o demo funcional.
+
+## Rodar frontend visual da Fase 5.5
+
+O frontend em `frontend/` e uma apresentacao visual do funcionamento do projeto.
+Ele nao substitui o widget real, nao e painel administrativo e nao altera a API.
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Abra:
+
+```text
+http://localhost:5173
+```
+
+O playground usa o proxy `/api-local` do Vite para chamar a API em
+`http://localhost:8000` durante o desenvolvimento. Detalhes:
+`docs/PHASE_5_5_FRONTEND_VISUAL_MAP.md`.
 
 ## Eventos permitidos
 
