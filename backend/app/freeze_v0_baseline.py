@@ -7,6 +7,7 @@ from pathlib import Path
 
 from sqlalchemy.orm import Session
 
+from .core.path_policy import resolve_project_path
 from .database import SessionLocal, init_db
 from .relation_policy import get_relation_policy
 from .recommender import normalize_text, recommend_from_catalog
@@ -30,9 +31,7 @@ class FreezeStats:
 
 
 def resolve_output_path(output: Path) -> Path:
-    if output.is_absolute():
-        return output
-    return PROJECT_ROOT / output
+    return resolve_project_path(output, PROJECT_ROOT, label="output")
 
 
 def _item_price(value: object) -> float | None:
@@ -149,7 +148,10 @@ def parse_args() -> argparse.Namespace:
         "--output",
         type=Path,
         default=DEFAULT_OUTPUT,
-        help="Output JSON path. Defaults to reports/baselines/v0_baseline_snapshot.json.",
+        help=(
+            "Output JSON path. Relative paths are resolved from repository root. "
+            "Defaults to reports/baselines/v0_baseline_snapshot.json."
+        ),
     )
     parser.add_argument(
         "--limit-products",

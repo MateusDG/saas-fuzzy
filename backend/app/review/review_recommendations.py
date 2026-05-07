@@ -6,6 +6,7 @@ from pathlib import Path
 
 from sqlalchemy.orm import Session
 
+from ..core.path_policy import resolve_project_path
 from ..core.database import SessionLocal, init_db
 from ..db.models import Product, Store
 from ..recommender import normalize_text, recommend_from_catalog
@@ -56,9 +57,7 @@ REVIEW_COLUMNS = [
 
 
 def resolve_output_path(output: Path) -> Path:
-    if output.is_absolute():
-        return output
-    return PROJECT_ROOT / output
+    return resolve_project_path(output, PROJECT_ROOT, label="output")
 
 
 def format_optional(value: object) -> str:
@@ -316,7 +315,10 @@ def parse_args() -> argparse.Namespace:
         "--output",
         type=Path,
         default=DEFAULT_OUTPUT,
-        help="Output CSV path. Defaults to reports/recommendation_review.csv.",
+        help=(
+            "Output CSV path. Relative paths are resolved from repository root. "
+            "Defaults to reports/recommendation_review.csv."
+        ),
     )
     parser.add_argument(
         "--product-type",

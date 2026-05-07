@@ -501,7 +501,7 @@ Com arquivos locais em `data/public/raw/`:
 
 ```powershell
 cd backend
-python -m app.preprocess_amazon_reviews_2023 --reviews-file ../data/public/raw/Appliances.jsonl --metadata-file ../data/public/raw/meta_Appliances.jsonl --output-dir ../data/public/processed --categories Appliances --premium-percentile 0.75 --min-rating 4 --min-item-interactions 20 --min-user-interactions 2
+python -m app.preprocess_amazon_reviews_2023 --reviews-file data/public/raw/Appliances.jsonl --metadata-file data/public/raw/meta_Appliances.jsonl --output-dir data/public/processed --categories Appliances --premium-percentile 0.75 --min-rating 4 --min-item-interactions 20 --min-user-interactions 2
 ```
 
 Depois execute:

@@ -6,6 +6,7 @@ from html import escape
 from pathlib import Path
 from unicodedata import normalize as unicode_normalize
 
+from ..core.path_policy import resolve_project_path as resolve_project_path_policy
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_INPUT = PROJECT_ROOT / "reports" / "recommendation_review.csv"
@@ -20,10 +21,8 @@ class ReviewPackStats:
     output_path: Path
 
 
-def resolve_project_path(path: Path) -> Path:
-    if path.is_absolute():
-        return path
-    return PROJECT_ROOT / path
+def resolve_project_path(path: Path, *, label: str) -> Path:
+    return resolve_project_path_policy(path, PROJECT_ROOT, label=label)
 
 
 def display_path(path: Path) -> str:
@@ -804,8 +803,8 @@ def generate_review_pack(
     min_score: float | None = None,
     product_type: str | None = None,
 ) -> ReviewPackStats:
-    input_path = resolve_project_path(input_path)
-    output_path = resolve_project_path(output_path)
+    input_path = resolve_project_path(input_path, label="input")
+    output_path = resolve_project_path(output_path, label="output")
     rows = filter_review_rows(
         read_review_rows(input_path),
         limit=limit,
@@ -838,13 +837,19 @@ def parse_args() -> argparse.Namespace:
         "--input",
         type=Path,
         default=DEFAULT_INPUT,
-        help="Input CSV path. Defaults to reports/recommendation_review.csv.",
+        help=(
+            "Input CSV path. Relative paths are resolved from repository root. "
+            "Defaults to reports/recommendation_review.csv."
+        ),
     )
     parser.add_argument(
         "--output",
         type=Path,
         default=DEFAULT_OUTPUT,
-        help="Output HTML path. Defaults to reports/recommendation_review.html.",
+        help=(
+            "Output HTML path. Relative paths are resolved from repository root. "
+            "Defaults to reports/recommendation_review.html."
+        ),
     )
     parser.add_argument(
         "--limit",

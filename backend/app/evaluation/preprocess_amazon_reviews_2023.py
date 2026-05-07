@@ -11,6 +11,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from ..core.path_policy import resolve_project_path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "public" / "processed"
@@ -35,10 +36,8 @@ class PositiveInteraction:
     timestamp: int
 
 
-def resolve_path(path: Path) -> Path:
-    if path.is_absolute():
-        return path.resolve()
-    return (Path.cwd() / path).resolve()
+def resolve_path(path: Path, *, label: str) -> Path:
+    return resolve_project_path(path, PROJECT_ROOT, label=label)
 
 
 def to_project_relative_or_name(path: Path) -> str:
@@ -417,19 +416,32 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Preprocess Amazon Reviews 2023 into Kouzina offline evaluation CSVs.",
     )
-    parser.add_argument("--reviews-file", type=Path, required=True, help="Path to reviews .jsonl or .jsonl.gz")
-    parser.add_argument("--metadata-file", type=Path, required=True, help="Path to metadata .jsonl or .jsonl.gz")
+    parser.add_argument(
+        "--reviews-file",
+        type=Path,
+        required=True,
+        help="Path to reviews .jsonl or .jsonl.gz. Relative paths are resolved from repository root.",
+    )
+    parser.add_argument(
+        "--metadata-file",
+        type=Path,
+        required=True,
+        help="Path to metadata .jsonl or .jsonl.gz. Relative paths are resolved from repository root.",
+    )
     parser.add_argument(
         "--output-dir",
         type=Path,
         default=DEFAULT_OUTPUT_DIR,
-        help="Directory where interactions_train.csv, interactions_test.csv and items.csv will be written.",
+        help=(
+            "Directory where interactions_train.csv, interactions_test.csv and items.csv will be written. "
+            "Relative paths are resolved from repository root."
+        ),
     )
     parser.add_argument(
         "--dataset-profile-output",
         type=Path,
         default=DEFAULT_PROFILE_PATH,
-        help="Path to dataset profile JSON output.",
+        help="Path to dataset profile JSON output. Relative paths are resolved from repository root.",
     )
     parser.add_argument(
         "--categories",
@@ -475,10 +487,10 @@ def preprocess(args: argparse.Namespace) -> dict[str, Any]:
     if args.min_user_interactions < 2:
         raise ValueError("--min-user-interactions must be at least 2")
 
-    reviews_path = resolve_path(args.reviews_file)
-    metadata_path = resolve_path(args.metadata_file)
-    output_dir = resolve_path(args.output_dir)
-    dataset_profile_output = resolve_path(args.dataset_profile_output)
+    reviews_path = resolve_path(args.reviews_file, label="input")
+    metadata_path = resolve_path(args.metadata_file, label="input")
+    output_dir = resolve_path(args.output_dir, label="output")
+    dataset_profile_output = resolve_path(args.dataset_profile_output, label="output")
     validate_input_files(reviews_path, metadata_path)
 
     items_by_id, metadata_stats = load_metadata_items(

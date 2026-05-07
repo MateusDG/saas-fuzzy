@@ -3,6 +3,7 @@ import csv
 import json
 from pathlib import Path
 
+from ..core.path_policy import resolve_project_path
 from .evaluation_baselines import (
     build_item_categories,
     build_item_popularity,
@@ -31,9 +32,7 @@ DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "reports" / "evaluation"
 
 
 def resolve_path(path: Path) -> Path:
-    if path.is_absolute():
-        return path
-    return PROJECT_ROOT / path
+    return resolve_project_path(path, PROJECT_ROOT, label="path")
 
 
 def read_csv_rows(path: Path) -> list[dict[str, str]]:
@@ -182,10 +181,30 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run offline evaluation baselines over prepared CSV datasets.",
     )
-    parser.add_argument("--train", type=Path, default=DEFAULT_TRAIN, help="Train interactions CSV path.")
-    parser.add_argument("--test", type=Path, default=DEFAULT_TEST, help="Test interactions CSV path.")
-    parser.add_argument("--items", type=Path, default=DEFAULT_ITEMS, help="Items CSV path.")
-    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR, help="Output directory path.")
+    parser.add_argument(
+        "--train",
+        type=Path,
+        default=DEFAULT_TRAIN,
+        help="Train interactions CSV path. Relative paths are resolved from repository root.",
+    )
+    parser.add_argument(
+        "--test",
+        type=Path,
+        default=DEFAULT_TEST,
+        help="Test interactions CSV path. Relative paths are resolved from repository root.",
+    )
+    parser.add_argument(
+        "--items",
+        type=Path,
+        default=DEFAULT_ITEMS,
+        help="Items CSV path. Relative paths are resolved from repository root.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=DEFAULT_OUTPUT_DIR,
+        help="Output directory path. Relative paths are resolved from repository root.",
+    )
     parser.add_argument("--top-k", type=int, default=10, help="Top-k cutoff for ranking metrics.")
     return parser.parse_args()
 
