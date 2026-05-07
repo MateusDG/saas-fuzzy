@@ -1,35 +1,54 @@
-# Resultados Fase 5.3 - Sensibilidade Metodologica
+# Resultados Fase 5.4 - Sensibilidade Metodologica
 
 ## Objetivo
 
-Comparar a sensibilidade dos baselines offline (popularidade e conteudo/categoria)
-em variacoes controladas de:
+Comparar a sensibilidade dos baselines offline em variacoes controladas do
+recorte Amazon Reviews 2023 / `Appliances`, sem fuzzy, sem ontologia e sem
+recomendador hibrido.
 
-1. compra verificada (`require_verified_purchase`);
-2. recorte premium por preco (`premium_percentile`).
+Variaveis avaliadas:
 
-Escopo desta fase:
+- compra verificada (`require_verified_purchase`);
+- percentil premium (`premium_percentile`);
+- volume de usuarios, itens e interacoes;
+- impacto nas metricas top-k.
 
-- dataset publico Amazon Reviews 2023;
-- categoria unica `Appliances`;
-- sem fuzzy;
-- sem ontologia;
-- sem recomendador hibrido;
-- sem dados reais de clientes Kouzina.
+## Premissa Metodologica
 
-Premissa metodologica:
+"High-end" continua sendo apenas proxy de produto premium por preco. O recorte
+nao representa renda, classe social, intencao consultiva, publico high-end real
+ou comportamento de clientes Kouzina.
 
-- "high-end" continua sendo apenas proxy de produto premium por preco;
-- nao representa renda, classe social, intencao consultiva ou perfil real de consumidor.
+Esta analise usa dataset publico offline. Nao ha dado real de cliente, CTR real
+ou conversao real nesta fase.
+
+## Execucao
+
+- Data da reexecucao: 2026-05-07
+- Dataset: Amazon Reviews 2023
+- Categoria: `Appliances`
+- Interacao positiva: `rating >= 4`
+- Filtro de qualidade: `average_rating >= 4.0`
+- Suporte minimo: `rating_number >= 20` ou equivalente disponivel
+- Split: temporal por usuario, ultima interacao positiva no teste
+- `min_user_interactions`: `2`
+- `seed`: `42`
 
 ## Configuracoes Comparadas
 
 - A (`p75_all`): `premium_percentile=0.75`, `require_verified_purchase=false`
 - B (`p75_verified`): `premium_percentile=0.75`, `require_verified_purchase=true`
 - C (`p90_all`): `premium_percentile=0.90`, `require_verified_purchase=false`
-- D (`p90_verified`): `premium_percentile=0.90`, `require_verified_purchase=true` (opcional, executada)
+- D (`p90_verified`): `premium_percentile=0.90`, `require_verified_purchase=true`
+
+A configuracao D foi executada porque o volume final permaneceu suficiente:
+`1455` usuarios avaliados e `766` itens finais.
 
 ## Tabela Comparativa
+
+Metricas abaixo referem-se ao baseline de popularidade. O baseline
+conteudo/categoria teve os mesmos valores em todas as configuracoes porque o
+recorte usa uma unica categoria (`Appliances`).
 
 | Configuracao | premium_percentile | require_verified_purchase | usuarios avaliados | itens finais | interacoes treino | interacoes teste | itens premium | itens removidos sem preco | itens removidos baixa interacao | itens removidos baixa avaliacao media | usuarios removidos baixa interacao | Precision@5 | Recall@5 | nDCG@5 | Cobertura@5 | Diversidade@5 | Precision@10 | Recall@10 | nDCG@10 | Cobertura@10 | Diversidade@10 |
 | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -38,82 +57,93 @@ Premissa metodologica:
 | C (`p90_all`) | 0.90 | false | 1664 | 842 | 1820 | 1664 | 1960 | 28083 | 15428 | 25880 | 88485 | 0.023317 | 0.116587 | 0.068468 | 0.008314 | 0.000000 | 0.020132 | 0.201322 | 0.096099 | 0.014252 | 0.000000 |
 | D (`p90_verified`) | 0.90 | true | 1455 | 766 | 1519 | 1455 | 1977 | 28083 | 15573 | 25880 | 86451 | 0.025842 | 0.129210 | 0.077696 | 0.009138 | 0.000000 | 0.023780 | 0.237801 | 0.112616 | 0.015666 | 0.000000 |
 
-Notas:
-
-- as metricas acima sao de baseline de popularidade;
-- baseline conteudo/categoria apresentou os mesmos valores em todas as configuracoes;
-- isso ocorre porque o recorte usa categoria unica (`Appliances`).
-
 ## Interpretacao
 
-### 1) Efeito de `require_verified_purchase=true`
+### Compra Verificada
 
-Com `premium_percentile=0.75`:
+Com `premium_percentile=0.75`, exigir compra verificada reduziu:
 
-- usuarios: 6651 -> 6118 (queda ~8.0%);
-- itens: 2798 -> 2662 (queda ~4.9%).
+- usuarios: `6651 -> 6118` (queda aproximada de 8.0%);
+- itens: `2798 -> 2662` (queda aproximada de 4.9%).
 
-Com `premium_percentile=0.90`:
+Com `premium_percentile=0.90`, exigir compra verificada reduziu:
 
-- usuarios: 1664 -> 1455 (queda ~12.6%);
-- itens: 842 -> 766 (queda ~9.0%).
+- usuarios: `1664 -> 1455` (queda aproximada de 12.6%);
+- itens: `842 -> 766` (queda aproximada de 9.0%).
 
-Resumo: exigir compra verificada reduz volume do recorte, mas nao inviabilizou a avaliacao nesta execucao.
+Leitura: `require_verified_purchase=true` reduz o volume, mas nao inviabiliza
+o benchmark neste recorte.
 
-### 2) Efeito de `P90` (premium mais restrito)
+### Premium Mais Restrito
 
-Sem filtro de compra verificada:
+Sem filtro de compra verificada, trocar P75 por P90 reduziu:
 
-- usuarios: 6651 -> 1664 (queda ~75.0%);
-- itens: 2798 -> 842 (queda ~69.9%).
+- usuarios: `6651 -> 1664` (queda aproximada de 75.0%);
+- itens: `2798 -> 842` (queda aproximada de 69.9%).
 
-Com compra verificada:
+Com compra verificada, trocar P75 por P90 reduziu:
 
-- usuarios: 6118 -> 1455 (queda ~76.2%);
-- itens: 2662 -> 766 (queda ~71.2%).
+- usuarios: `6118 -> 1455` (queda aproximada de 76.2%);
+- itens: `2662 -> 766` (queda aproximada de 71.2%).
 
-Resumo: `P90` reduz fortemente o catalogo e a base avaliada.
+Leitura: P90 torna o recorte muito mais restrito e altera fortemente o tamanho
+do problema.
 
-### 3) Variacao das metricas
+### Metricas Top-k
 
-As metricas agregadas aumentaram nas configuracoes mais restritivas (principalmente `P90`), mas essa melhora nao deve ser interpretada como ganho de modelagem.
+As metricas aumentam nas configuracoes mais restritivas, principalmente P90.
+Isso nao deve ser interpretado como ganho de modelo.
 
 Leitura correta nesta fase:
 
-- o espaco de candidatos fica menor;
-- o problema fica mais facil;
-- Precision/Recall/nDCG podem subir por efeito de recorte, nao por modelo melhor.
+- o espaco de candidatos diminui;
+- a base avaliada fica mais concentrada;
+- Precision, Recall e nDCG podem subir por efeito do recorte.
 
-### 4) Diversidade zero
+### Diversidade
 
-`Diversidade@5` e `Diversidade@10` ficaram em `0.000000` em todas as configuracoes.
+`Diversidade@5` e `Diversidade@10` ficaram em `0.000000` em todas as
+configuracoes.
 
-Isto e esperado no piloto atual porque:
+Isso e esperado porque:
 
-- o recorte foi de categoria unica (`Appliances`);
-- a metrica de diversidade simples depende de variacao de categoria.
+- o piloto usa uma unica categoria (`Appliances`);
+- a metrica simples de diversidade depende de variacao de categoria.
 
-## Limitacoes
+### Conteudo/Categoria
 
-- recorte restrito a uma categoria publica;
-- proxy premium por preco nao valida publico high-end real;
-- ausencia de validacao online com clientes;
-- sem fuzzy, sem ontologia e sem recomendador hibrido nesta fase.
+O baseline conteudo/categoria ficou igual ao de popularidade em todas as
+configuracoes. Neste recorte, todos os itens pertencem a `Appliances`, entao o
+sinal de categoria nao cria ordenacao adicional relevante.
 
-## Artefatos Locais Da Execucao
+## Artefatos Locais
 
-Foram gerados artefatos locais por configuracao em:
+Artefatos locais gerados por configuracao:
 
+- `data/public/processed/sensitivity/p75_all/`
+- `data/public/processed/sensitivity/p75_verified/`
+- `data/public/processed/sensitivity/p90_all/`
+- `data/public/processed/sensitivity/p90_verified/`
 - `reports/evaluation/sensitivity/p75_all/`
 - `reports/evaluation/sensitivity/p75_verified/`
 - `reports/evaluation/sensitivity/p90_all/`
 - `reports/evaluation/sensitivity/p90_verified/`
 
-Esses artefatos estao configurados para permanecer locais (ignorados), com
-`docs/RESULTS_PHASE_5_SENSITIVITY.md` como artefato textual principal versionavel.
+Esses arquivos permanecem locais e ignorados pelo Git. O artefato versionavel
+principal desta fase e este documento.
 
-## Proximos Passos Recomendados
+## Limitacoes
 
-1. Repetir a analise incluindo `Home_and_Kitchen` em execucao separada.
-2. Incluir comparacao com snapshot congelado do ranking v0 no protocolo offline.
-3. Revisar ameaças a validade antes de iniciar Fase 6.
+- recorte restrito a `Appliances`;
+- proxy premium por preco nao valida publico high-end real;
+- dataset publico Amazon nao representa o catalogo Kouzina;
+- sem validacao online, sem CTR real e sem conversao real;
+- sem fuzzy, sem ontologia e sem recomendador hibrido.
+
+## Proximos Passos
+
+1. Repetir a analise com `Home_and_Kitchen` em fase separada, sem misturar
+   conclusoes com `Appliances`.
+2. Comparar posteriormente com o snapshot congelado do ranking v0 dentro do
+   protocolo offline.
+3. Revisar ameacas a validade antes de iniciar Fase 6.
