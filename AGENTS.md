@@ -963,6 +963,43 @@ Evitar decisões que aumentem complexidade sem gerar valor imediato para:
 
 ---
 
+## 24. Estado pós-Fase 5.3.1
+
+A Fase 5.3.1 reorganizou o backend sem alterar o ranking v0, a API pública ou o widget.
+
+Estrutura canônica atual:
+
+- `backend/app/core/`: configuração e banco;
+- `backend/app/api/routes/`: endpoints FastAPI;
+- `backend/app/db/`: modelos SQLAlchemy;
+- `backend/app/schemas/`: contratos Pydantic;
+- `backend/app/services/`: serviços de eventos e recomendações;
+- `backend/app/recommender/`: regras, scoring, política e explicações do v0;
+- `backend/app/catalog/`: seed/importação de catálogo;
+- `backend/app/review/`: review pack CSV/HTML;
+- `backend/app/evaluation/`: avaliação acadêmica offline.
+
+Wrappers antigos foram mantidos para comandos como:
+
+```bash
+python -m app.seed
+python -m app.review_recommendations
+python -m app.export_review_pack
+python -m app.preprocess_amazon_reviews_2023
+python -m app.run_offline_evaluation
+```
+
+Alembic foi introduzido em `backend/alembic/`. Em ambiente controlado, preferir:
+
+```bash
+cd backend
+alembic upgrade head
+```
+
+`init_db()` continua com `create_all` apenas como fallback local/teste.
+
+---
+
 ## 24. Nota adicional da Fase 4.9
 
 Na Fase 4.9, as conclusoes da reuniao simulada de especialistas (Fase 4.8)

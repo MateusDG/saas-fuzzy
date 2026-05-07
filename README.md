@@ -62,6 +62,10 @@ Documentos da fase:
 - `data/public/README.md`
 - `docs/AMAZON_REVIEWS_2023_PREPROCESSING.md`
 - `docs/RESULTS_PHASE_5_BASELINE.md`
+- `docs/RESULTS_PHASE_5_SENSITIVITY.md`
+- `docs/BACKEND_STRUCTURE.md`
+- `docs/DATABASE_MIGRATIONS.md`
+- `docs/PHASE_5_3_1_BACKEND_AUDIT.md`
 
 ## Estrutura
 
@@ -69,19 +73,43 @@ Documentos da fase:
 backend/
   app/
     __init__.py
-    evaluation_baselines.py
-    evaluation_metrics.py
-    freeze_v0_baseline.py
     main.py
-    database.py
-    export_review_pack.py
-    models.py
-    recommender.py
-    review_recommendations.py
-    run_offline_evaluation.py
-    schemas.py
-    seed.py
-    settings.py
+    core/
+      config.py
+      database.py
+    api/routes/
+      health.py
+      events.py
+      recommendations.py
+    db/
+      models.py
+    schemas/
+      health.py
+      events.py
+      recommendations.py
+    services/
+      event_service.py
+      recommendation_service.py
+    recommender/
+      rules.py
+      scoring.py
+      relation_policy.py
+      service.py
+    catalog/
+      seed.py
+    review/
+      review_recommendations.py
+      export_review_pack.py
+    evaluation/
+      evaluation_baselines.py
+      evaluation_metrics.py
+      preprocess_amazon_reviews_2023.py
+      run_offline_evaluation.py
+    freeze_v0_baseline.py
+    # wrappers antigos preservados: seed.py, run_offline_evaluation.py etc.
+  alembic/
+    env.py
+    versions/
   tests/
   Dockerfile
   requirements.txt
@@ -148,6 +176,18 @@ A API ficara em:
 ```text
 http://localhost:8000
 ```
+
+## Rodar migrations
+
+Em ambiente controlado, use Alembic para evoluir o schema:
+
+```powershell
+cd backend
+alembic upgrade head
+```
+
+`init_db()` ainda mantem `create_all` como fallback local/teste, mas ele nao
+substitui migrations para alterar tabelas existentes.
 
 ## Criar tabelas e importar produtos
 

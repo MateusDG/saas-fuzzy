@@ -21,7 +21,8 @@ coleta de eventos reais suficientes.
 Artefatos versionados da politica provisoria:
 
 - `data/relation_policy_seed.csv` (fonte de politica);
-- `backend/app/relation_policy.py` (loader e fallback seguro).
+- `backend/app/recommender/relation_policy.py` (loader e fallback seguro);
+- `backend/app/relation_policy.py` (wrapper compativel para imports antigos).
 
 ## Objetivo
 

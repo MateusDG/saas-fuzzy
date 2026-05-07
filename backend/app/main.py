@@ -1,41 +1,16 @@
 from contextlib import asynccontextmanager
-from datetime import UTC, datetime
 
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
 
-from .database import get_db, init_db
-from .models import Product, RecommendationEvent, Store
-from .recommender import get_mock_recommendations, recommend_from_catalog
-from .schemas import EventIn, EventResponse, HealthResponse, RecommendationResponse
-from .settings import get_settings
+from .api.routes.events import router as events_router
+from .api.routes.health import router as health_router
+from .api.routes.recommendations import router as recommendations_router
+from .core.config import get_settings
+from .core.database import init_db
 
 settings = get_settings()
-
-SAFE_METADATA_KEYS = {
-    "event_name",
-    "timestamp",
-    "source_product_id",
-    "source_product_type",
-    "recommended_product_id",
-    "recommended_product_type",
-    "rank",
-    "recommendation_count",
-    "recommended_product_ids",
-    "score",
-    "relation_class",
-    "relation_type",
-    "relation_policy_action",
-    "validation_status",
-    "is_quote_only",
-    "quote_reason",
-    "environment",
-    "brand",
-    "price_band",
-    "funnel_stage",
-}
 
 
 @asynccontextmanager
@@ -62,124 +37,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-def sanitize_metadata(metadata: dict) -> dict:
-    return {
-        key: value
-        for key, value in metadata.items()
-        if key in SAFE_METADATA_KEYS
-    }
-
-
-def build_event_metadata(event: EventIn) -> dict:
-    metadata = sanitize_metadata(event.metadata)
-    event_data = {
-        "event_name": event.resolved_event_name,
-        "timestamp": event.timestamp.isoformat() if event.timestamp else None,
-        "source_product_id": event.source_product_id or event.product_id,
-        "source_product_type": event.source_product_type,
-        "recommended_product_id": event.recommended_product_id,
-        "recommended_product_type": event.recommended_product_type,
-        "rank": event.rank,
-        "score": event.score,
-        "relation_class": event.relation_class,
-        "relation_type": event.relation_type,
-        "relation_policy_action": event.relation_policy_action,
-        "validation_status": event.validation_status,
-        "is_quote_only": event.is_quote_only,
-        "quote_reason": event.quote_reason,
-        "environment": event.environment,
-        "brand": event.brand,
-        "price_band": event.price_band,
-        "funnel_stage": event.funnel_stage,
-    }
-    metadata.update({key: value for key, value in event_data.items() if value is not None})
-    return sanitize_metadata(metadata)
-
-
-@app.get("/health", response_model=HealthResponse)
-def health() -> HealthResponse:
-    return HealthResponse(
-        status="ok",
-        service="kouzina-reco-api",
-        version="0.1.0",
-    )
-
-
-@app.post("/events", response_model=EventResponse)
-def create_event(event: EventIn, db: Session = Depends(get_db)) -> EventResponse:
-    timestamp = datetime.now(UTC)
-    resolved_event_name = event.resolved_event_name
-
-    try:
-        store = db.query(Store).filter(Store.slug == "kouzina").one_or_none()
-        recommendation_event = RecommendationEvent(
-            store_id=store.id if store else None,
-            event_type=resolved_event_name,
-            anonymous_id=event.anonymous_id,
-            session_id=event.session_id,
-            page_url=event.page_url,
-            product_external_id=event.source_product_id or event.product_id,
-            widget_id=event.widget_id,
-            recommended_product_external_id=event.recommended_product_id,
-            event_metadata=build_event_metadata(event),
-        )
-        db.add(recommendation_event)
-        db.commit()
-        db.refresh(recommendation_event)
-        timestamp = recommendation_event.created_at
-    except SQLAlchemyError as exc:
-        db.rollback()
-        print(f"[KouzinaReco] event persistence skipped: {exc}")
-
-    return EventResponse(
-        received=True,
-        event_type=resolved_event_name,
-        timestamp=timestamp,
-    )
-
-
-@app.get("/recommendations", response_model=RecommendationResponse)
-def get_recommendations(
-    product_id: str | None = None,
-    widget_id: str | None = None,
-    db: Session = Depends(get_db),
-) -> RecommendationResponse:
-    try:
-        if not product_id:
-            raise LookupError("missing product_id")
-
-        current_product = (
-            db.query(Product)
-            .filter(Product.external_id == product_id, Product.active.is_(True))
-            .one_or_none()
-        )
-        if current_product is None:
-            raise LookupError("current product not found")
-
-        products = (
-            db.query(Product)
-            .filter(
-                Product.store_id == current_product.store_id,
-                Product.active.is_(True),
-            )
-            .all()
-        )
-        if len(products) <= 1:
-            raise LookupError("insufficient candidates")
-
-        recommendations = recommend_from_catalog(current_product, products, limit=4)
-        if recommendations:
-            return RecommendationResponse(
-                widget_title="Complete seu projeto",
-                product_id=product_id,
-                recommendations=recommendations,
-            )
-    except (SQLAlchemyError, LookupError) as exc:
-        print(f"[KouzinaReco] recommendation fallback used: {exc}")
-
-    return RecommendationResponse(
-        widget_title="Complete seu projeto",
-        product_id=product_id,
-        recommendations=get_mock_recommendations(),
-    )
+app.include_router(health_router)
+app.include_router(events_router)
+app.include_router(recommendations_router)

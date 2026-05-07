@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 AllowedEventType = Literal[
@@ -21,12 +21,6 @@ AllowedEventType = Literal[
     "alternative_requested",
     "session_ended",
 ]
-
-
-class HealthResponse(BaseModel):
-    status: str
-    service: str
-    version: str
 
 
 class EventIn(BaseModel):
@@ -71,21 +65,3 @@ class EventResponse(BaseModel):
     received: bool
     event_type: AllowedEventType
     timestamp: datetime
-
-
-class RecommendationItem(BaseModel):
-    product_id: str
-    name: str
-    url: HttpUrl
-    image_url: HttpUrl | None = None
-    price: float | None = None
-    reason: str
-    score: float
-
-    model_config = ConfigDict(json_encoders={HttpUrl: str})
-
-
-class RecommendationResponse(BaseModel):
-    widget_title: str
-    product_id: str | None
-    recommendations: list[RecommendationItem]

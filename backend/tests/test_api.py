@@ -151,6 +151,7 @@ def test_events_saves_recommendation_event(client: TestClient, db_session: Sessi
 
     saved_event = db_session.query(RecommendationEvent).one()
     assert saved_event.event_type == "recommendation_click"
+    assert saved_event.event_name == "recommendation_click"
     assert saved_event.anonymous_id == "anon_123"
     assert saved_event.product_external_id == "12345"
     assert saved_event.recommended_product_external_id == "mock-001"
@@ -887,6 +888,20 @@ def test_events_accept_future_funnel_payload(client: TestClient, db_session: Ses
     assert saved_event is not None
     assert saved_event.product_external_id == "source-001"
     assert saved_event.recommended_product_external_id == "recommended-001"
+    assert saved_event.event_name == "recommendations_rendered"
+    assert saved_event.source_product_type == "Cooktop"
+    assert saved_event.recommended_product_type == "Coifa"
+    assert saved_event.rank == 1
+    assert saved_event.score == 92.0
+    assert saved_event.relation_class == "universal"
+    assert saved_event.relation_type == "complement"
+    assert saved_event.relation_policy_action == "boost"
+    assert saved_event.validation_status == "agent_hypothesis"
+    assert saved_event.is_quote_only is False
+    assert saved_event.environment == "Cozinha Gourmet"
+    assert saved_event.brand == "Franke"
+    assert saved_event.price_band == "high"
+    assert saved_event.funnel_stage == "rendered"
     assert saved_event.event_metadata["event_name"] == "recommendations_rendered"
     assert saved_event.event_metadata["source_product_type"] == "Cooktop"
     assert saved_event.event_metadata["relation_class"] == "universal"

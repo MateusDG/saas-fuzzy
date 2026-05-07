@@ -59,6 +59,29 @@ Eventos anonimos por sessao com:
 
 Sem PII e sem login obrigatorio.
 
+## Preparacao Tecnica Da Fase 5.3.1
+
+A tabela `recommendation_events` foi preparada com colunas opcionais para:
+
+- `event_name`;
+- `source_product_type`;
+- `recommended_product_type`;
+- `rank`;
+- `score`;
+- `relation_class`;
+- `relation_type`;
+- `relation_policy_action`;
+- `validation_status`;
+- `is_quote_only`;
+- `quote_reason`;
+- `environment`;
+- `brand`;
+- `price_band`;
+- `funnel_stage`.
+
+Esses campos facilitam consultas futuras, mas este documento continua sendo um
+plano. Nenhuma analise real de funil foi executada nesta fase.
+
 ## Criterios De Qualidade Antes Da Analise
 
 - sem lacunas graves de tracking;

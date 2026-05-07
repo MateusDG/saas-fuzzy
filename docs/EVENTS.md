@@ -90,11 +90,29 @@ Nao coletar:
 Campos salvos em `recommendation_events`:
 
 - `event_type`;
+- `event_name`;
 - `anonymous_id`;
 - `session_id`;
 - `page_url`;
 - `product_external_id`;
 - `widget_id`;
 - `recommended_product_external_id`;
+- `source_product_type`;
+- `recommended_product_type`;
+- `rank`;
+- `score`;
+- `relation_class`;
+- `relation_type`;
+- `relation_policy_action`;
+- `validation_status`;
+- `is_quote_only`;
+- `quote_reason`;
+- `environment`;
+- `brand`;
+- `price_band`;
+- `funnel_stage`;
 - `metadata`;
 - `created_at`.
+
+As colunas analiticas sao opcionais e foram adicionadas para preparar analise
+futura de funil. Elas nao indicam que a analise ja foi executada.
